@@ -19,11 +19,10 @@ class LissajousResponsePublisher:
         self.omega_x = rospy.get_param("~omega_x", 1.0)
         self.omega_y = rospy.get_param("~omega_y", 2.0)
         self.delta_x = rospy.get_param("~delta_x", 0.0)
-        self.delta_y = rospy.get_param("~delta_y", 90) * math.pi/180.0
+        self.delta_y = rospy.get_param("~delta_y", 0) * math.pi/180.0
         self.velocity = rospy.get_param("~velocity", 0.1)
-        self.orientation_offset = rospy.get_param("~orientation_offset", 45.0) * math.pi/180.0 
-        #self.number_of_points = rospy.get_param("~number_of_points", 1000)
-        self.distance_between_points = rospy.get_param("~distance_between_points", 0.05)
+        self.orientation_offset = rospy.get_param("~orientation_offset", 70) * math.pi/180.0 
+        self.number_of_points = rospy.get_param("~number_of_points", 1000)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
         self.virtual_leader_pose_topic = rospy.get_param("~virtual_leader_pose_topic", "/virtual_leader/leader_pose")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_leader/cmd_vel")
@@ -51,9 +50,22 @@ class LissajousResponsePublisher:
         rospy.wait_for_message(self.virtual_leader_pose_topic, PoseStamped)
         rospy.loginfo("Received virtual leader pose")
         virtual_leader_angle = transformations.euler_from_quaternion([self.virtual_leader_pose.pose.orientation.x, self.virtual_leader_pose.pose.orientation.y, self.virtual_leader_pose.pose.orientation.z, self.virtual_leader_pose.pose.orientation.w])[2]
-        for t in range(0, 1000):
-            self.pose_stamped.pose.position.x = self.virtual_leader_pose.pose.position.x + self.Ax * math.sin(self.omega_x * t/100.0) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.omega_y * t/100.0) * math.sin(virtual_leader_angle)
-            self.pose_stamped.pose.position.y = self.virtual_leader_pose.pose.position.y + self.Ax * math.sin(self.omega_x * t/100.0) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.omega_y * t/100.0) * math.cos(virtual_leader_angle)
+        
+        # start point and first point of the lissajous curve to compute the orientation offset
+        initial_x = self.virtual_leader_pose.pose.position.x + self.Ax * math.sin(self.delta_x) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.delta_y) * math.sin(virtual_leader_angle)
+        initial_y = self.virtual_leader_pose.pose.position.y + self.Ax * math.sin(self.delta_x) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.delta_y) * math.cos(virtual_leader_angle)
+        t = 1
+        first_x = self.virtual_leader_pose.pose.position.x + self.Ax * math.sin(self.delta_x) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.delta_y) * math.sin(virtual_leader_angle) + self.Ax * math.sin(self.velocity * self.omega_x * t/100.0) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.velocity * self.omega_y * t/100.0) * math.sin(virtual_leader_angle)
+        first_y = self.virtual_leader_pose.pose.position.y + self.Ax * math.sin(self.delta_x) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.delta_y) * math.cos(virtual_leader_angle) + self.Ax * math.sin(self.velocity * self.omega_x * t/100.0) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.velocity * self.omega_y * t/100.0) * math.cos(virtual_leader_angle)
+        
+        initial_angle = math.atan2(first_y-initial_y, first_x-initial_x)
+        virtual_leader_angle -= initial_angle + self.orientation_offset
+        
+        for t in range(0, int(1000 / self.velocity)):
+            self.pose_stamped.pose.position.x = self.virtual_leader_pose.pose.position.x + self.Ax * math.sin(self.delta_x) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.delta_y) * math.sin(virtual_leader_angle) + self.Ax * math.sin(self.velocity * self.omega_x * t/100.0) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.velocity * self.omega_y * t/100.0) * math.sin(virtual_leader_angle)
+            self.pose_stamped.pose.position.y = self.virtual_leader_pose.pose.position.y + self.Ax * math.sin(self.delta_x) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.delta_y) * math.cos(virtual_leader_angle) + self.Ax * math.sin(self.velocity * self.omega_x * t/100.0) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.velocity * self.omega_y * t/100.0) * math.cos(virtual_leader_angle)
+            #self.pose_stamped.pose.position.x = self.virtual_leader_pose.pose.position.x + self.Ax * math.sin(self.velocity * self.omega_x * t/100.0) * math.cos(virtual_leader_angle) - self.Ay * math.sin(self.velocity * self.omega_y * t/100.0) * math.sin(virtual_leader_angle)
+            #self.pose_stamped.pose.position.y = self.virtual_leader_pose.pose.position.y + self.Ax * math.sin(self.velocity * self.omega_x * t/100.0) * math.sin(virtual_leader_angle) + self.Ay * math.sin(self.velocity * self.omega_y * t/100.0) * math.cos(virtual_leader_angle)
             self.pose_stamped.pose.position.z = 0.0
             self.pose_stamped.pose.orientation.x = 0.0
             self.pose_stamped.pose.orientation.y = 0.0
@@ -68,19 +80,24 @@ class LissajousResponsePublisher:
         self.cmd = Twist()
 
         rate = rospy.Rate(100)
-        phi_old = 0.0
+        # phi_old = 0.0
         for i in range(0,len(self.path.poses)-1):
             dx = self.path.poses[i+1].pose.position.x - self.path.poses[i].pose.position.x
             dy = self.path.poses[i+1].pose.position.y - self.path.poses[i].pose.position.y
             
             self.cmd.linear.x = math.sqrt(dx**2 + dy**2) * 100.0
             phi_new = math.atan2(dy,dx)
+            if i == 0:
+                phi_old = phi_new
             self.cmd.angular.z = (phi_new - phi_old) * 100.0
             phi_old = phi_new
             
+            print(phi_new)
+            
             self.cmd_publisher.publish(self.cmd)
-            rospy.loginfo("Published cmd_vel")
             rate.sleep()
+            if rospy.is_shutdown():
+                break
         
                 
     def virtual_leader_pose_callback(self, msg):
