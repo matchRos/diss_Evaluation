@@ -26,10 +26,12 @@ class LissajousResponsePublisher:
         self.distance_between_points = rospy.get_param("~distance_between_points", 0.05)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
         self.virtual_leader_pose_topic = rospy.get_param("~virtual_leader_pose_topic", "/virtual_leader/leader_pose")
+        self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_leader/cmd_vel")
         pass
     
     def __init__(self):
         self.config()
+        self.cmd_publisher = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=10)
         self.path_publisher = rospy.Publisher(self.lissajous_path_topic, Path, queue_size=10, latch=True)
         rospy.Subscriber(self.virtual_leader_pose_topic, PoseStamped, self.virtual_leader_pose_callback)
         
@@ -61,6 +63,25 @@ class LissajousResponsePublisher:
             
         self.path_publisher.publish(self.path)
         rospy.sleep(1.0)
+        
+        # compute the target velocity by differentiating the lissajous curve
+        self.cmd = Twist()
+
+        rate = rospy.Rate(100)
+        phi_old = 0.0
+        for i in range(0,len(self.path.poses)-1):
+            dx = self.path.poses[i+1].pose.position.x - self.path.poses[i].pose.position.x
+            dy = self.path.poses[i+1].pose.position.y - self.path.poses[i].pose.position.y
+            
+            self.cmd.linear.x = math.sqrt(dx**2 + dy**2) * 100.0
+            phi_new = math.atan2(dy,dx)
+            self.cmd.angular.z = (phi_new - phi_old) * 100.0
+            phi_old = phi_new
+            
+            self.cmd_publisher.publish(self.cmd)
+            rospy.loginfo("Published cmd_vel")
+            rate.sleep()
+        
                 
     def virtual_leader_pose_callback(self, msg):
         self.virtual_leader_pose = msg
