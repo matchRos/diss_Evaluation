@@ -14,8 +14,8 @@ from copy import deepcopy
 class LissajousResponsePublisher:
     
     def config(self):
-        self.Ax = rospy.get_param("~Ax", 4.0)
-        self.Ay = rospy.get_param("~Ay", 4.0)
+        self.Ax = rospy.get_param("~Ax", 3.0)
+        self.Ay = rospy.get_param("~Ay", 3.0)
         self.omega_x = rospy.get_param("~omega_x", 1.0)
         self.omega_y = rospy.get_param("~omega_y", 2.0)
         self.delta_x = rospy.get_param("~delta_x", 0.0)
