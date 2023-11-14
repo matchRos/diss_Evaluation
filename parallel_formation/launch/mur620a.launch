@@ -1,0 +1,18 @@
+<launch>
+    <!-- Defining arguments for the mur launch --> 
+    <arg name="leader_pose_topic" default='/virtual_leader/leader_pose'/>
+    <arg name="leader_velocity_topic" default='/virtual_leader/leader_vel'/>
+    <arg name="actual_pose_topic" default='/mur620a/mir_pose_stamped_simple'/>
+    <arg name="follower_cmd_vel_topic" default='/mur620a/cmd_vel'/>
+    <arg name="relative_position" default="[0.0, -1.0, 0.0]"/>
+   
+    <include file="$(find formation_controller)/launch/decentralized_leader_follower_control.launch">
+        <arg name="leader_pose_topic" value="$(arg leader_pose_topic)"/>
+        <arg name="leader_velocity_topic" value="$(arg leader_velocity_topic)"/>
+        <arg name="actual_pose_topic" value="$(arg actual_pose_topic)"/>
+        <arg name="follower_cmd_vel_topic" value="$(arg follower_cmd_vel_topic)"/>
+        <arg name="relative_position" value="$(arg relative_position)"/>
+    </include> 
+
+
+</launch>
