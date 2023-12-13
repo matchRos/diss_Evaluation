@@ -10,7 +10,7 @@ class MoveMirToStartPose():
 
     def config(self):
         self.target_pose = rospy.get_param("~target_pose", [37,36,0])
-        self.tf_prefix = rospy.get_param("~tf_prefix", "mur620d")
+        self.tf_prefix = rospy.get_param("~tf_prefix", "mur620b")
 
     def __init__(self):
         rospy.init_node('move_mir_to_start_pose', anonymous=True)
