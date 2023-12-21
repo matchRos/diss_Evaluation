@@ -5,11 +5,12 @@ from geometry_msgs.msg import PoseStamped
 from mbf_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import tf
+from math import pi
 
 class MoveMirToStartPose():
 
     def config(self):
-        self.target_pose = rospy.get_param("~target_pose", [37,36,0])
+        self.target_pose = rospy.get_param("~target_pose", [36,36,pi])
         self.tf_prefix = rospy.get_param("~tf_prefix", "mur620b")
 
     def __init__(self):
