@@ -14,13 +14,13 @@ from copy import deepcopy
 class LissajousResponsePublisher:
     
     def config(self):
-        self.Ax = rospy.get_param("~Ax", 2.0)
-        self.Ay = rospy.get_param("~Ay", 2.0)
+        self.Ax = rospy.get_param("~Ax", 3.0)
+        self.Ay = rospy.get_param("~Ay", 3.0)
         self.omega_x = rospy.get_param("~omega_x", 2.0)
         self.omega_y = rospy.get_param("~omega_y", 3.0)
         self.delta_x = rospy.get_param("~delta_x", 0.0)
         self.delta_y = rospy.get_param("~delta_y", 0) * math.pi/180.0
-        self.velocity = rospy.get_param("~velocity", 0.03)
+        self.velocity = rospy.get_param("~velocity", 0.05)
         self.orientation_offset = rospy.get_param("~orientation_offset", 0) * math.pi/180.0 
         self.number_of_points = rospy.get_param("~number_of_points", 1000)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
@@ -91,11 +91,25 @@ class LissajousResponsePublisher:
             phi_new = math.atan2(dy,dx)
             if i == 0:
                 phi_old = phi_new
-            self.cmd.angular.z = (phi_new - phi_old) * 100.0
+
+            # detect pi jumps
+            dphi = phi_new - phi_old
+            if dphi > math.pi:
+                dphi -= 2.0 * math.pi
+            elif dphi < -math.pi:
+                dphi += 2.0 * math.pi
+
+            self.cmd.angular.z = dphi * 100.0
+            
+            
+            if abs(self.cmd.angular.z) > 3.0:
+                rospy.logwarn("Angular velocity too high: " + str(self.cmd.angular.z)) 
+                rospy.loginfo("phi_new: " + str(phi_new))
+                rospy.loginfo("phi_old: " + str(phi_old))
+                rospy.loginfo("i: " + str(i))
+
             phi_old = phi_new
-            
-            print(phi_new)
-            
+
             self.cmd_publisher.publish(self.cmd)
             rate.sleep()
             if rospy.is_shutdown():
