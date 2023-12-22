@@ -66,6 +66,8 @@ Visualization Manager:
         All Enabled: false
         Scout_Mini:
           Value: true
+        UR_ee:
+          Value: true
         UR_r_calibrate:
           Value: false
         map:
@@ -180,21 +182,9 @@ Visualization Manager:
           Value: false
         mur620c/UR10_l/base_link_inertia:
           Value: false
-        mur620c/UR10_l/calibrated_ee_pose:
-          Value: false
         mur620c/UR10_l/flange:
           Value: false
-        mur620c/UR10_l/forearm_link:
-          Value: false
-        mur620c/UR10_l/shoulder_link:
-          Value: false
         mur620c/UR10_l/tool0:
-          Value: false
-        mur620c/UR10_l/upper_arm_link:
-          Value: false
-        mur620c/UR10_l/wrist_1_link:
-          Value: false
-        mur620c/UR10_l/wrist_2_link:
           Value: false
         mur620c/UR10_l/wrist_3_link:
           Value: false
@@ -206,33 +196,19 @@ Visualization Manager:
           Value: false
         mur620c/UR10_r/base_link_inertia:
           Value: false
-        mur620c/UR10_r/calibrated_ee_pose:
-          Value: false
         mur620c/UR10_r/flange:
-          Value: false
-        mur620c/UR10_r/forearm_link:
-          Value: false
-        mur620c/UR10_r/shoulder_link:
           Value: false
         mur620c/UR10_r/tool0:
           Value: false
-        mur620c/UR10_r/upper_arm_link:
-          Value: false
-        mur620c/UR10_r/wrist_1_link:
-          Value: false
-        mur620c/UR10_r/wrist_2_link:
-          Value: false
         mur620c/UR10_r/wrist_3_link:
           Value: false
+        mur620c/actual_pose:
+          Value: true
         mur620c/back_laser_link:
-          Value: false
-        mur620c/base:
           Value: false
         mur620c/base_footprint:
           Value: false
         mur620c/base_link:
-          Value: false
-        mur620c/base_link_inertia:
           Value: false
         mur620c/camera_bottom_screw_frame:
           Value: false
@@ -270,8 +246,6 @@ Visualization Manager:
           Value: false
         mur620c/camera_link:
           Value: false
-        mur620c/flange:
-          Value: false
         mur620c/front_laser_link:
           Value: false
         mur620c/imu_frame:
@@ -290,18 +264,18 @@ Visualization Manager:
           Value: false
         mur620c/surface:
           Value: false
-        mur620c/tool0:
-          Value: false
+        mur620c/target_pose_control:
+          Value: true
         mur620c/top_module:
           Value: false
         mur620c/us_1_frame:
           Value: false
         mur620c/us_2_frame:
           Value: false
-        mur620c/wrist_3_link:
-          Value: false
         mur620d:
           Value: false
+        plank:
+          Value: true
         tire:
           Value: false
         virtual_leader/base_footprint:
@@ -316,6 +290,25 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
+          mocap:
+            Scout_Mini:
+              {}
+            UR_ee:
+              {}
+            UR_r_calibrate:
+              {}
+            mur620a:
+              {}
+            mur620b:
+              {}
+            mur620c:
+              {}
+            mur620d:
+              {}
+            plank:
+              {}
+            tire:
+              {}
           mur620b/actual_pose:
             {}
           mur620b/odom:
@@ -337,18 +330,18 @@ Visualization Manager:
                       {}
                   mur620b/camera_floor_left_depth_optical_frame:
                     {}
-                mur620b/camera_floor_right_link:
-                  mur620b/camera_floor_right_color_frame:
-                    mur620b/camera_floor_right_color_optical_frame:
-                      {}
-                  mur620b/camera_floor_right_depth_optical_frame:
-                    {}
                   mur620b/camera_infra1_frame:
                     mur620b/camera_infra1_optical_frame:
                       {}
                   mur620b/camera_infra2_frame:
                     mur620b/camera_infra2_optical_frame:
                       {}
+                mur620b/camera_floor_right_link:
+                  mur620b/camera_floor_right_color_frame:
+                    mur620b/camera_floor_right_color_optical_frame:
+                      {}
+                  mur620b/camera_floor_right_depth_optical_frame:
+                    {}
                 mur620b/front_laser_link:
                   {}
                 mur620b/imu_link:
@@ -377,14 +370,12 @@ Visualization Manager:
                   {}
           mur620b/target_pose_control:
             {}
+          mur620c/actual_pose:
+            {}
           mur620c/odom:
             mur620c/base_footprint:
               mur620c/base_link:
                 mur620c/back_laser_link:
-                  {}
-                mur620c/base:
-                  {}
-                mur620c/base_link_inertia:
                   {}
                 mur620c/camera_bottom_screw_frame:
                   mur620c/camera_link:
@@ -421,61 +412,18 @@ Visualization Manager:
                   {}
                 mur620c/top_module:
                   mur620c/left_lift_bottom:
-                    mur620c/left_lift_top:
-                      mur620c/UR10_l/base_ideal:
-                        mur620c/UR10_l/base_link:
-                          mur620c/UR10_l/base:
-                            mur620c/UR10_l/calibrated_ee_pose:
-                              {}
-                          mur620c/UR10_l/base_link_inertia:
-                            mur620c/UR10_l/shoulder_link:
-                              mur620c/UR10_l/upper_arm_link:
-                                mur620c/UR10_l/forearm_link:
-                                  mur620c/UR10_l/wrist_1_link:
-                                    mur620c/UR10_l/wrist_2_link:
-                                      mur620c/UR10_l/wrist_3_link:
-                                        mur620c/UR10_l/flange:
-                                          mur620c/UR10_l/tool0:
-                                            {}
+                    {}
                   mur620c/right_lift_bottom:
-                    mur620c/right_lift_top:
-                      mur620c/UR10_r/base_ideal:
-                        mur620c/UR10_r/base_link:
-                          mur620c/UR10_r/base:
-                            mur620c/UR10_r/calibrated_ee_pose:
-                              {}
-                          mur620c/UR10_r/base_link_inertia:
-                            mur620c/UR10_r/shoulder_link:
-                              mur620c/UR10_r/upper_arm_link:
-                                mur620c/UR10_r/forearm_link:
-                                  mur620c/UR10_r/wrist_1_link:
-                                    mur620c/UR10_r/wrist_2_link:
-                                      mur620c/UR10_r/wrist_3_link:
-                                        mur620c/UR10_r/flange:
-                                          mur620c/UR10_r/tool0:
-                                            {}
+                    {}
                 mur620c/us_1_frame:
                   {}
                 mur620c/us_2_frame:
                   {}
+          mur620c/target_pose_control:
+            {}
           virtual_leader/odom:
             virtual_leader/base_footprint:
               {}
-        mocap:
-          Scout_Mini:
-            {}
-          UR_r_calibrate:
-            {}
-          mur620a:
-            {}
-          mur620b:
-            {}
-          mur620c:
-            {}
-          mur620d:
-            {}
-          tire:
-            {}
         mur620b/UR10_l/wrist_3_link:
           mur620b/UR10_l/flange:
             mur620b/UR10_l/tool0:
@@ -484,10 +432,28 @@ Visualization Manager:
           mur620b/UR10_r/flange:
             mur620b/UR10_r/tool0:
               {}
-        mur620c/wrist_3_link:
-          mur620c/flange:
-            mur620c/tool0:
+        mur620c/UR10_l/wrist_3_link:
+          mur620c/UR10_l/flange:
+            mur620c/UR10_l/tool0:
               {}
+        mur620c/UR10_r/wrist_3_link:
+          mur620c/UR10_r/flange:
+            mur620c/UR10_r/tool0:
+              {}
+        mur620c/left_lift_top:
+          mur620c/UR10_l/base_ideal:
+            mur620c/UR10_l/base_link:
+              mur620c/UR10_l/base:
+                {}
+              mur620c/UR10_l/base_link_inertia:
+                {}
+        mur620c/right_lift_top:
+          mur620c/UR10_r/base_ideal:
+            mur620c/UR10_r/base_link:
+              mur620c/UR10_r/base:
+                {}
+              mur620c/UR10_r/base_link_inertia:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988079071
@@ -503,13 +469,13 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 25; 255; 0
+      Color: 164; 0; 0
       Enabled: true
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
+      Line Style: Billboards
+      Line Width: 0.10000000149011612
       Name: Path
       Offset:
         X: 0
@@ -618,7 +584,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 38.497432708740234
+      Distance: 11.60179328918457
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -626,8 +592,8 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 35.323455810546875
-        Y: 37.463809967041016
+        X: 36.20951843261719
+        Y: 38.50862121582031
         Z: -4.291534423828125e-06
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
