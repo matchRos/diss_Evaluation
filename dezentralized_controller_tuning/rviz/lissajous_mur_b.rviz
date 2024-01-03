@@ -6,13 +6,14 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /TF1
         - /TF1/Frames1
         - /Map1
         - /Path1
         - /Map2
         - /LaserScan1
         - /LaserScan2
-      Splitter Ratio: 0.5
+      Splitter Ratio: 0.8993993997573853
     Tree Height: 2067
   - Class: rviz/Selection
     Name: Selection
@@ -31,7 +32,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -64,224 +65,212 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        Scout_Mini:
-          Value: true
-        UR_ee:
-          Value: true
-        UR_r_calibrate:
-          Value: false
         map:
           Value: false
         mocap:
           Value: false
         mur620a:
           Value: false
-        mur620b:
+        mur620a/UR10_l/base:
           Value: false
-        mur620b/UR10_l/base:
+        mur620a/UR10_l/base_ideal:
           Value: false
-        mur620b/UR10_l/base_ideal:
+        mur620a/UR10_l/base_link:
           Value: false
-        mur620b/UR10_l/base_link:
+        mur620a/UR10_l/base_link_inertia:
           Value: false
-        mur620b/UR10_l/base_link_inertia:
+        mur620a/UR10_l/flange:
           Value: false
-        mur620b/UR10_l/flange:
+        mur620a/UR10_l/tool0:
           Value: false
-        mur620b/UR10_l/tool0:
+        mur620a/UR10_l/wrist_3_link:
           Value: false
-        mur620b/UR10_l/wrist_3_link:
+        mur620a/UR10_r/base:
           Value: false
-        mur620b/UR10_r/base:
+        mur620a/UR10_r/base_ideal:
           Value: false
-        mur620b/UR10_r/base_ideal:
+        mur620a/UR10_r/base_link:
           Value: false
-        mur620b/UR10_r/base_link:
+        mur620a/UR10_r/base_link_inertia:
           Value: false
-        mur620b/UR10_r/base_link_inertia:
+        mur620a/UR10_r/flange:
           Value: false
-        mur620b/UR10_r/flange:
+        mur620a/UR10_r/tool0:
           Value: false
-        mur620b/UR10_r/tool0:
+        mur620a/UR10_r/wrist_3_link:
           Value: false
-        mur620b/UR10_r/wrist_3_link:
+        mur620a/actual_pose:
           Value: false
-        mur620b/actual_pose:
+        mur620a/back_laser_link:
+          Value: false
+        mur620a/base_footprint:
           Value: true
-        mur620b/back_laser_link:
+        mur620a/base_link:
           Value: false
-        mur620b/base_footprint:
+        mur620a/camera_bottom_screw_frame:
           Value: false
-        mur620b/base_link:
+        mur620a/camera_color_frame:
           Value: false
-        mur620b/camera_bottom_screw_frame:
+        mur620a/camera_color_optical_frame:
           Value: false
-        mur620b/camera_color_frame:
+        mur620a/camera_depth_frame:
           Value: false
-        mur620b/camera_color_optical_frame:
+        mur620a/camera_depth_optical_frame:
           Value: false
-        mur620b/camera_depth_frame:
+        mur620a/camera_floor_left_color_frame:
           Value: false
-        mur620b/camera_depth_optical_frame:
+        mur620a/camera_floor_left_color_optical_frame:
           Value: false
-        mur620b/camera_floor_left_color_frame:
+        mur620a/camera_floor_left_depth_optical_frame:
           Value: false
-        mur620b/camera_floor_left_color_optical_frame:
+        mur620a/camera_floor_left_link:
           Value: false
-        mur620b/camera_floor_left_depth_optical_frame:
+        mur620a/camera_floor_right_color_frame:
           Value: false
-        mur620b/camera_floor_left_link:
+        mur620a/camera_floor_right_color_optical_frame:
           Value: false
-        mur620b/camera_floor_right_color_frame:
+        mur620a/camera_floor_right_depth_optical_frame:
           Value: false
-        mur620b/camera_floor_right_color_optical_frame:
+        mur620a/camera_floor_right_link:
           Value: false
-        mur620b/camera_floor_right_depth_optical_frame:
+        mur620a/camera_infra1_frame:
           Value: false
-        mur620b/camera_floor_right_link:
+        mur620a/camera_infra1_optical_frame:
           Value: false
-        mur620b/camera_infra1_frame:
+        mur620a/camera_infra2_frame:
           Value: false
-        mur620b/camera_infra1_optical_frame:
+        mur620a/camera_infra2_optical_frame:
           Value: false
-        mur620b/camera_infra2_frame:
+        mur620a/camera_link:
           Value: false
-        mur620b/camera_infra2_optical_frame:
+        mur620a/front_laser_link:
           Value: false
-        mur620b/camera_link:
+        mur620a/imu_frame:
           Value: false
-        mur620b/front_laser_link:
+        mur620a/imu_link:
           Value: false
-        mur620b/imu_frame:
+        mur620a/left_lift_bottom:
           Value: false
-        mur620b/imu_link:
+        mur620a/odom:
           Value: false
-        mur620b/left_lift_bottom:
+        mur620a/right_lift_bottom:
           Value: false
-        mur620b/odom:
+        mur620a/surface:
           Value: false
-        mur620b/right_lift_bottom:
-          Value: false
-        mur620b/surface:
-          Value: false
-        mur620b/target_pose_control:
+        mur620a/target_pose_control:
           Value: true
-        mur620b/top_module:
+        mur620a/top_module:
           Value: false
-        mur620b/us_1_frame:
+        mur620a/us_1_frame:
           Value: false
-        mur620b/us_2_frame:
-          Value: false
-        mur620c:
-          Value: false
-        mur620c/UR10_l/base:
-          Value: false
-        mur620c/UR10_l/base_ideal:
-          Value: false
-        mur620c/UR10_l/base_link:
-          Value: false
-        mur620c/UR10_l/base_link_inertia:
-          Value: false
-        mur620c/UR10_l/flange:
-          Value: false
-        mur620c/UR10_l/tool0:
-          Value: false
-        mur620c/UR10_l/wrist_3_link:
-          Value: false
-        mur620c/UR10_r/base:
-          Value: false
-        mur620c/UR10_r/base_ideal:
-          Value: false
-        mur620c/UR10_r/base_link:
-          Value: false
-        mur620c/UR10_r/base_link_inertia:
-          Value: false
-        mur620c/UR10_r/flange:
-          Value: false
-        mur620c/UR10_r/tool0:
-          Value: false
-        mur620c/UR10_r/wrist_3_link:
-          Value: false
-        mur620c/actual_pose:
-          Value: true
-        mur620c/back_laser_link:
-          Value: false
-        mur620c/base_footprint:
-          Value: false
-        mur620c/base_link:
-          Value: false
-        mur620c/camera_bottom_screw_frame:
-          Value: false
-        mur620c/camera_color_frame:
-          Value: false
-        mur620c/camera_color_optical_frame:
-          Value: false
-        mur620c/camera_depth_frame:
-          Value: false
-        mur620c/camera_depth_optical_frame:
-          Value: false
-        mur620c/camera_floor_left_color_frame:
-          Value: false
-        mur620c/camera_floor_left_color_optical_frame:
-          Value: false
-        mur620c/camera_floor_left_depth_optical_frame:
-          Value: false
-        mur620c/camera_floor_left_link:
-          Value: false
-        mur620c/camera_floor_right_color_frame:
-          Value: false
-        mur620c/camera_floor_right_color_optical_frame:
-          Value: false
-        mur620c/camera_floor_right_depth_optical_frame:
-          Value: false
-        mur620c/camera_floor_right_link:
-          Value: false
-        mur620c/camera_infra1_frame:
-          Value: false
-        mur620c/camera_infra1_optical_frame:
-          Value: false
-        mur620c/camera_infra2_frame:
-          Value: false
-        mur620c/camera_infra2_optical_frame:
-          Value: false
-        mur620c/camera_link:
-          Value: false
-        mur620c/front_laser_link:
-          Value: false
-        mur620c/imu_frame:
-          Value: false
-        mur620c/imu_link:
-          Value: false
-        mur620c/left_lift_bottom:
-          Value: false
-        mur620c/left_lift_top:
-          Value: false
-        mur620c/odom:
-          Value: false
-        mur620c/right_lift_bottom:
-          Value: false
-        mur620c/right_lift_top:
-          Value: false
-        mur620c/surface:
-          Value: false
-        mur620c/target_pose_control:
-          Value: true
-        mur620c/top_module:
-          Value: false
-        mur620c/us_1_frame:
-          Value: false
-        mur620c/us_2_frame:
+        mur620a/us_2_frame:
           Value: false
         mur620d:
+          Value: true
+        mur620d/UR10_l/base:
+          Value: false
+        mur620d/UR10_l/base_ideal:
+          Value: false
+        mur620d/UR10_l/base_link:
+          Value: false
+        mur620d/UR10_l/base_link_inertia:
+          Value: false
+        mur620d/UR10_l/flange:
+          Value: false
+        mur620d/UR10_l/tool0:
+          Value: false
+        mur620d/UR10_l/wrist_3_link:
+          Value: false
+        mur620d/UR10_r/base:
+          Value: false
+        mur620d/UR10_r/base_ideal:
+          Value: false
+        mur620d/UR10_r/base_link:
+          Value: false
+        mur620d/UR10_r/base_link_inertia:
+          Value: false
+        mur620d/UR10_r/flange:
+          Value: false
+        mur620d/UR10_r/tool0:
+          Value: false
+        mur620d/UR10_r/wrist_3_link:
+          Value: false
+        mur620d/actual_pose:
+          Value: false
+        mur620d/back_laser_link:
+          Value: false
+        mur620d/base_footprint:
+          Value: true
+        mur620d/base_link:
+          Value: false
+        mur620d/camera_bottom_screw_frame:
+          Value: false
+        mur620d/camera_color_frame:
+          Value: false
+        mur620d/camera_color_optical_frame:
+          Value: false
+        mur620d/camera_depth_frame:
+          Value: false
+        mur620d/camera_depth_optical_frame:
+          Value: false
+        mur620d/camera_floor_left_color_frame:
+          Value: false
+        mur620d/camera_floor_left_color_optical_frame:
+          Value: false
+        mur620d/camera_floor_left_depth_optical_frame:
+          Value: false
+        mur620d/camera_floor_left_link:
+          Value: false
+        mur620d/camera_floor_right_color_frame:
+          Value: false
+        mur620d/camera_floor_right_color_optical_frame:
+          Value: false
+        mur620d/camera_floor_right_depth_optical_frame:
+          Value: false
+        mur620d/camera_floor_right_link:
+          Value: false
+        mur620d/camera_infra1_frame:
+          Value: false
+        mur620d/camera_infra1_optical_frame:
+          Value: false
+        mur620d/camera_infra2_frame:
+          Value: false
+        mur620d/camera_infra2_optical_frame:
+          Value: false
+        mur620d/camera_link:
+          Value: false
+        mur620d/front_laser_link:
+          Value: false
+        mur620d/imu_frame:
+          Value: false
+        mur620d/imu_link:
+          Value: false
+        mur620d/left_lift_bottom:
+          Value: false
+        mur620d/left_lift_top:
+          Value: false
+        mur620d/odom:
+          Value: false
+        mur620d/right_lift_bottom:
+          Value: false
+        mur620d/right_lift_top:
+          Value: false
+        mur620d/surface:
+          Value: false
+        mur620d/target_pose_control:
+          Value: true
+        mur620d/top_module:
+          Value: false
+        mur620d/us_1_frame:
+          Value: false
+        mur620d/us_2_frame:
           Value: false
         plank:
-          Value: true
-        tire:
           Value: false
         virtual_leader/base_footprint:
           Value: true
         virtual_leader/odom:
-          Value: true
+          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -291,168 +280,156 @@ Visualization Manager:
       Tree:
         map:
           mocap:
-            Scout_Mini:
-              {}
-            UR_ee:
-              {}
-            UR_r_calibrate:
-              {}
             mur620a:
-              {}
-            mur620b:
-              {}
-            mur620c:
               {}
             mur620d:
               {}
             plank:
               {}
-            tire:
-              {}
-          mur620b/actual_pose:
+          mur620a/actual_pose:
             {}
-          mur620b/odom:
-            mur620b/base_footprint:
-              mur620b/base_link:
-                mur620b/back_laser_link:
+          mur620a/odom:
+            mur620a/base_footprint:
+              mur620a/base_link:
+                mur620a/back_laser_link:
                   {}
-                mur620b/camera_bottom_screw_frame:
-                  mur620b/camera_link:
-                    mur620b/camera_color_frame:
-                      mur620b/camera_color_optical_frame:
+                mur620a/camera_bottom_screw_frame:
+                  mur620a/camera_link:
+                    mur620a/camera_color_frame:
+                      mur620a/camera_color_optical_frame:
                         {}
-                    mur620b/camera_depth_frame:
-                      mur620b/camera_depth_optical_frame:
+                    mur620a/camera_depth_frame:
+                      mur620a/camera_depth_optical_frame:
                         {}
-                mur620b/camera_floor_left_link:
-                  mur620b/camera_floor_left_color_frame:
-                    mur620b/camera_floor_left_color_optical_frame:
+                mur620a/camera_floor_left_link:
+                  mur620a/camera_floor_left_color_frame:
+                    mur620a/camera_floor_left_color_optical_frame:
                       {}
-                  mur620b/camera_floor_left_depth_optical_frame:
+                  mur620a/camera_floor_left_depth_optical_frame:
                     {}
-                  mur620b/camera_infra1_frame:
-                    mur620b/camera_infra1_optical_frame:
+                mur620a/camera_floor_right_link:
+                  mur620a/camera_floor_right_color_frame:
+                    mur620a/camera_floor_right_color_optical_frame:
                       {}
-                  mur620b/camera_infra2_frame:
-                    mur620b/camera_infra2_optical_frame:
-                      {}
-                mur620b/camera_floor_right_link:
-                  mur620b/camera_floor_right_color_frame:
-                    mur620b/camera_floor_right_color_optical_frame:
-                      {}
-                  mur620b/camera_floor_right_depth_optical_frame:
+                  mur620a/camera_floor_right_depth_optical_frame:
                     {}
-                mur620b/front_laser_link:
+                  mur620a/camera_infra1_frame:
+                    mur620a/camera_infra1_optical_frame:
+                      {}
+                  mur620a/camera_infra2_frame:
+                    mur620a/camera_infra2_optical_frame:
+                      {}
+                mur620a/front_laser_link:
                   {}
-                mur620b/imu_link:
-                  mur620b/imu_frame:
+                mur620a/imu_link:
+                  mur620a/imu_frame:
                     {}
-                mur620b/surface:
+                mur620a/surface:
                   {}
-                mur620b/top_module:
-                  mur620b/left_lift_bottom:
-                    mur620b/UR10_l/base_ideal:
-                      mur620b/UR10_l/base_link:
-                        mur620b/UR10_l/base:
+                mur620a/top_module:
+                  mur620a/left_lift_bottom:
+                    mur620a/UR10_l/base_ideal:
+                      mur620a/UR10_l/base_link:
+                        mur620a/UR10_l/base:
                           {}
-                        mur620b/UR10_l/base_link_inertia:
+                        mur620a/UR10_l/base_link_inertia:
                           {}
-                  mur620b/right_lift_bottom:
-                    mur620b/UR10_r/base_ideal:
-                      mur620b/UR10_r/base_link:
-                        mur620b/UR10_r/base:
+                  mur620a/right_lift_bottom:
+                    mur620a/UR10_r/base_ideal:
+                      mur620a/UR10_r/base_link:
+                        mur620a/UR10_r/base:
                           {}
-                        mur620b/UR10_r/base_link_inertia:
+                        mur620a/UR10_r/base_link_inertia:
                           {}
-                mur620b/us_1_frame:
+                mur620a/us_1_frame:
                   {}
-                mur620b/us_2_frame:
+                mur620a/us_2_frame:
                   {}
-          mur620b/target_pose_control:
+          mur620a/target_pose_control:
             {}
-          mur620c/actual_pose:
+          mur620d/actual_pose:
             {}
-          mur620c/odom:
-            mur620c/base_footprint:
-              mur620c/base_link:
-                mur620c/back_laser_link:
+          mur620d/odom:
+            mur620d/base_footprint:
+              mur620d/base_link:
+                mur620d/back_laser_link:
                   {}
-                mur620c/camera_bottom_screw_frame:
-                  mur620c/camera_link:
-                    mur620c/camera_color_frame:
-                      mur620c/camera_color_optical_frame:
+                mur620d/camera_bottom_screw_frame:
+                  mur620d/camera_link:
+                    mur620d/camera_color_frame:
+                      mur620d/camera_color_optical_frame:
                         {}
-                    mur620c/camera_depth_frame:
-                      mur620c/camera_depth_optical_frame:
+                    mur620d/camera_depth_frame:
+                      mur620d/camera_depth_optical_frame:
                         {}
-                mur620c/camera_floor_left_link:
-                  mur620c/camera_floor_left_color_frame:
-                    mur620c/camera_floor_left_color_optical_frame:
+                mur620d/camera_floor_left_link:
+                  mur620d/camera_floor_left_color_frame:
+                    mur620d/camera_floor_left_color_optical_frame:
                       {}
-                  mur620c/camera_floor_left_depth_optical_frame:
+                  mur620d/camera_floor_left_depth_optical_frame:
                     {}
-                mur620c/camera_floor_right_link:
-                  mur620c/camera_floor_right_color_frame:
-                    mur620c/camera_floor_right_color_optical_frame:
+                  mur620d/camera_infra1_frame:
+                    mur620d/camera_infra1_optical_frame:
                       {}
-                  mur620c/camera_floor_right_depth_optical_frame:
-                    {}
-                  mur620c/camera_infra1_frame:
-                    mur620c/camera_infra1_optical_frame:
+                  mur620d/camera_infra2_frame:
+                    mur620d/camera_infra2_optical_frame:
                       {}
-                  mur620c/camera_infra2_frame:
-                    mur620c/camera_infra2_optical_frame:
+                mur620d/camera_floor_right_link:
+                  mur620d/camera_floor_right_color_frame:
+                    mur620d/camera_floor_right_color_optical_frame:
                       {}
-                mur620c/front_laser_link:
-                  {}
-                mur620c/imu_link:
-                  mur620c/imu_frame:
+                  mur620d/camera_floor_right_depth_optical_frame:
                     {}
-                mur620c/surface:
+                mur620d/front_laser_link:
                   {}
-                mur620c/top_module:
-                  mur620c/left_lift_bottom:
+                mur620d/imu_link:
+                  mur620d/imu_frame:
                     {}
-                  mur620c/right_lift_bottom:
+                mur620d/surface:
+                  {}
+                mur620d/top_module:
+                  mur620d/left_lift_bottom:
                     {}
-                mur620c/us_1_frame:
+                  mur620d/right_lift_bottom:
+                    {}
+                mur620d/us_1_frame:
                   {}
-                mur620c/us_2_frame:
+                mur620d/us_2_frame:
                   {}
-          mur620c/target_pose_control:
+          mur620d/target_pose_control:
             {}
           virtual_leader/odom:
             virtual_leader/base_footprint:
               {}
-        mur620b/UR10_l/wrist_3_link:
-          mur620b/UR10_l/flange:
-            mur620b/UR10_l/tool0:
+        mur620a/UR10_l/wrist_3_link:
+          mur620a/UR10_l/flange:
+            mur620a/UR10_l/tool0:
               {}
-        mur620b/UR10_r/wrist_3_link:
-          mur620b/UR10_r/flange:
-            mur620b/UR10_r/tool0:
+        mur620a/UR10_r/wrist_3_link:
+          mur620a/UR10_r/flange:
+            mur620a/UR10_r/tool0:
               {}
-        mur620c/UR10_l/wrist_3_link:
-          mur620c/UR10_l/flange:
-            mur620c/UR10_l/tool0:
+        mur620d/UR10_l/wrist_3_link:
+          mur620d/UR10_l/flange:
+            mur620d/UR10_l/tool0:
               {}
-        mur620c/UR10_r/wrist_3_link:
-          mur620c/UR10_r/flange:
-            mur620c/UR10_r/tool0:
+        mur620d/UR10_r/wrist_3_link:
+          mur620d/UR10_r/flange:
+            mur620d/UR10_r/tool0:
               {}
-        mur620c/left_lift_top:
-          mur620c/UR10_l/base_ideal:
-            mur620c/UR10_l/base_link:
-              mur620c/UR10_l/base:
+        mur620d/left_lift_top:
+          mur620d/UR10_l/base_ideal:
+            mur620d/UR10_l/base_link:
+              mur620d/UR10_l/base:
                 {}
-              mur620c/UR10_l/base_link_inertia:
+              mur620d/UR10_l/base_link_inertia:
                 {}
-        mur620c/right_lift_top:
-          mur620c/UR10_r/base_ideal:
-            mur620c/UR10_r/base_link:
-              mur620c/UR10_r/base:
+        mur620d/right_lift_top:
+          mur620d/UR10_r/base_ideal:
+            mur620d/UR10_r/base_link:
+              mur620d/UR10_r/base:
                 {}
-              mur620c/UR10_r/base_link_inertia:
+              mur620d/UR10_r/base_link_inertia:
                 {}
       Update Interval: 0
       Value: true
@@ -494,12 +471,12 @@ Visualization Manager:
       Class: rviz/Map
       Color Scheme: map
       Draw Behind: false
-      Enabled: true
+      Enabled: false
       Name: Map
       Topic: /mur620b/move_base_flex/global_costmap/costmap
       Unreliable: false
       Use Timestamp: false
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -584,7 +561,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 11.60179328918457
+      Distance: 7.002061367034912
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -592,9 +569,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 36.20951843261719
-        Y: 38.50862121582031
-        Z: -4.291534423828125e-06
+        X: 36.030975341796875
+        Y: 35.89682388305664
+        Z: -2.86102294921875e-06
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -610,7 +587,7 @@ Window Geometry:
   Height: 2732
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000029c0000095afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000e900fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000e9fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000008e0000095a000001fe00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001d60000095afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000008e0000095a0000019300fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000013500000007afc0100000002fb0000000800540069006d00650100000000000013500000095000fffffffb0000000800540069006d0065010000000000000450000000000000000000000ebe0000095a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000003170000095afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000e900fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000e9fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000008e0000095a000001fe00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001d60000095afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000008e0000095a0000019300fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000013500000007afc0100000002fb0000000800540069006d00650100000000000013500000095000fffffffb0000000800540069006d0065010000000000000450000000000000000000000e430000095a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:

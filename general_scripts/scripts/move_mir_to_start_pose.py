@@ -10,8 +10,8 @@ from math import pi
 class MoveMirToStartPose():
 
     def config(self):
-        self.target_pose = rospy.get_param("~target_pose", [36,36,pi])
-        self.tf_prefix = rospy.get_param("~tf_prefix", "mur620b")
+        self.target_pose = rospy.get_param("~target_pose", [38,35,0])
+        self.tf_prefix = rospy.get_param("~tf_prefix", "mur620d")
 
     def __init__(self):
         rospy.init_node('move_mir_to_start_pose', anonymous=True)
@@ -22,7 +22,7 @@ class MoveMirToStartPose():
         
         
         # Create a publisher to send the target pose
-        target_pose_pub = rospy.Publisher("/" + self.tf_prefix + '/move_base_simple/goal', PoseStamped, queue_size=10)
+        target_pose_pub = rospy.Publisher("/" + self.tf_prefix + '/move_base_simple/goal', PoseStamped, queue_size=10, latch=True)
         
         # Wait for the action server to become available
         rospy.loginfo('Waiting for move base action server')
