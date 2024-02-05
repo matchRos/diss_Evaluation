@@ -4,7 +4,7 @@
     <arg name="leader_velocity_topic" default='/virtual_leader/leader_vel'/>
     <arg name="actual_pose_topic" default='/mur620d/mir_pose_stamped_simple'/>
     <arg name="follower_cmd_vel_topic" default='/mur620d/cmd_vel'/>
-    <arg name="relative_position" default="[1.5, -1.5, 0.0]"/>
+    <arg name="relative_position" default="[1.0, -0.75, 3.1415]"/>
     <arg name="tf_prefix" default="mur620d"/>
     <arg name="drive_backwards" default="false"/>
    

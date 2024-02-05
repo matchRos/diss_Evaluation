@@ -67,10 +67,6 @@ Visualization Manager:
         All Enabled: false
         map:
           Value: false
-        mocap:
-          Value: false
-        mur620a:
-          Value: false
         mur620a/UR10_l/base:
           Value: false
         mur620a/UR10_l/base_ideal:
@@ -165,8 +161,6 @@ Visualization Manager:
           Value: false
         mur620a/us_2_frame:
           Value: false
-        mur620d:
-          Value: true
         mur620d/UR10_l/base:
           Value: false
         mur620d/UR10_l/base_ideal:
@@ -175,9 +169,21 @@ Visualization Manager:
           Value: false
         mur620d/UR10_l/base_link_inertia:
           Value: false
+        mur620d/UR10_l/calibrated_ee_pose:
+          Value: false
         mur620d/UR10_l/flange:
           Value: false
+        mur620d/UR10_l/forearm_link:
+          Value: false
+        mur620d/UR10_l/shoulder_link:
+          Value: false
         mur620d/UR10_l/tool0:
+          Value: false
+        mur620d/UR10_l/upper_arm_link:
+          Value: false
+        mur620d/UR10_l/wrist_1_link:
+          Value: false
+        mur620d/UR10_l/wrist_2_link:
           Value: false
         mur620d/UR10_l/wrist_3_link:
           Value: false
@@ -189,19 +195,33 @@ Visualization Manager:
           Value: false
         mur620d/UR10_r/base_link_inertia:
           Value: false
+        mur620d/UR10_r/calibrated_ee_pose:
+          Value: false
         mur620d/UR10_r/flange:
+          Value: false
+        mur620d/UR10_r/forearm_link:
+          Value: false
+        mur620d/UR10_r/shoulder_link:
           Value: false
         mur620d/UR10_r/tool0:
           Value: false
+        mur620d/UR10_r/upper_arm_link:
+          Value: false
+        mur620d/UR10_r/wrist_1_link:
+          Value: false
+        mur620d/UR10_r/wrist_2_link:
+          Value: false
         mur620d/UR10_r/wrist_3_link:
           Value: false
-        mur620d/actual_pose:
-          Value: false
         mur620d/back_laser_link:
+          Value: false
+        mur620d/base:
           Value: false
         mur620d/base_footprint:
           Value: true
         mur620d/base_link:
+          Value: false
+        mur620d/base_link_inertia:
           Value: false
         mur620d/camera_bottom_screw_frame:
           Value: false
@@ -239,6 +259,8 @@ Visualization Manager:
           Value: false
         mur620d/camera_link:
           Value: false
+        mur620d/flange:
+          Value: true
         mur620d/front_laser_link:
           Value: false
         mur620d/imu_frame:
@@ -257,7 +279,7 @@ Visualization Manager:
           Value: false
         mur620d/surface:
           Value: false
-        mur620d/target_pose_control:
+        mur620d/tool0:
           Value: true
         mur620d/top_module:
           Value: false
@@ -265,8 +287,8 @@ Visualization Manager:
           Value: false
         mur620d/us_2_frame:
           Value: false
-        plank:
-          Value: false
+        mur620d/wrist_3_link:
+          Value: true
         virtual_leader/base_footprint:
           Value: true
         virtual_leader/odom:
@@ -279,13 +301,6 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          mocap:
-            mur620a:
-              {}
-            mur620d:
-              {}
-            plank:
-              {}
           mur620a/actual_pose:
             {}
           mur620a/odom:
@@ -347,12 +362,14 @@ Visualization Manager:
                   {}
           mur620a/target_pose_control:
             {}
-          mur620d/actual_pose:
-            {}
           mur620d/odom:
             mur620d/base_footprint:
               mur620d/base_link:
                 mur620d/back_laser_link:
+                  {}
+                mur620d/base:
+                  {}
+                mur620d/base_link_inertia:
                   {}
                 mur620d/camera_bottom_screw_frame:
                   mur620d/camera_link:
@@ -389,15 +406,43 @@ Visualization Manager:
                   {}
                 mur620d/top_module:
                   mur620d/left_lift_bottom:
-                    {}
+                    mur620d/left_lift_top:
+                      mur620d/UR10_l/base_ideal:
+                        mur620d/UR10_l/base_link:
+                          mur620d/UR10_l/base:
+                            mur620d/UR10_l/calibrated_ee_pose:
+                              {}
+                          mur620d/UR10_l/base_link_inertia:
+                            mur620d/UR10_l/shoulder_link:
+                              mur620d/UR10_l/upper_arm_link:
+                                mur620d/UR10_l/forearm_link:
+                                  mur620d/UR10_l/wrist_1_link:
+                                    mur620d/UR10_l/wrist_2_link:
+                                      mur620d/UR10_l/wrist_3_link:
+                                        mur620d/UR10_l/flange:
+                                          mur620d/UR10_l/tool0:
+                                            {}
                   mur620d/right_lift_bottom:
-                    {}
+                    mur620d/right_lift_top:
+                      mur620d/UR10_r/base_ideal:
+                        mur620d/UR10_r/base_link:
+                          mur620d/UR10_r/base:
+                            mur620d/UR10_r/calibrated_ee_pose:
+                              {}
+                          mur620d/UR10_r/base_link_inertia:
+                            mur620d/UR10_r/shoulder_link:
+                              mur620d/UR10_r/upper_arm_link:
+                                mur620d/UR10_r/forearm_link:
+                                  mur620d/UR10_r/wrist_1_link:
+                                    mur620d/UR10_r/wrist_2_link:
+                                      mur620d/UR10_r/wrist_3_link:
+                                        mur620d/UR10_r/flange:
+                                          mur620d/UR10_r/tool0:
+                                            {}
                 mur620d/us_1_frame:
                   {}
                 mur620d/us_2_frame:
                   {}
-          mur620d/target_pose_control:
-            {}
           virtual_leader/odom:
             virtual_leader/base_footprint:
               {}
@@ -409,28 +454,10 @@ Visualization Manager:
           mur620a/UR10_r/flange:
             mur620a/UR10_r/tool0:
               {}
-        mur620d/UR10_l/wrist_3_link:
-          mur620d/UR10_l/flange:
-            mur620d/UR10_l/tool0:
+        mur620d/wrist_3_link:
+          mur620d/flange:
+            mur620d/tool0:
               {}
-        mur620d/UR10_r/wrist_3_link:
-          mur620d/UR10_r/flange:
-            mur620d/UR10_r/tool0:
-              {}
-        mur620d/left_lift_top:
-          mur620d/UR10_l/base_ideal:
-            mur620d/UR10_l/base_link:
-              mur620d/UR10_l/base:
-                {}
-              mur620d/UR10_l/base_link_inertia:
-                {}
-        mur620d/right_lift_top:
-          mur620d/UR10_r/base_ideal:
-            mur620d/UR10_r/base_link:
-              mur620d/UR10_r/base:
-                {}
-              mur620d/UR10_r/base_link_inertia:
-                {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988079071
@@ -561,7 +588,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 7.002061367034912
+      Distance: 5.064644813537598
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -569,17 +596,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 36.030975341796875
-        Y: 35.89682388305664
+        X: 36.37651062011719
+        Y: 36.91731262207031
         Z: -2.86102294921875e-06
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 1.5547963380813599
       Target Frame: <Fixed Frame>
-      Yaw: 2.12040638923645
+      Yaw: 1.510406494140625
     Saved: ~
 Window Geometry:
   Displays:
