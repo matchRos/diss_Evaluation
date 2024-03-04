@@ -14,13 +14,13 @@ from copy import deepcopy
 class LissajousResponsePublisher:
     
     def config(self):
-        self.Ax = rospy.get_param("~Ax", 2.0)
-        self.Ay = rospy.get_param("~Ay", 2.0)
+        self.Ax = rospy.get_param("~Ax", 3.0)
+        self.Ay = rospy.get_param("~Ay", 3.0)
         self.omega_x = rospy.get_param("~omega_x", 2.0)
         self.omega_y = rospy.get_param("~omega_y", 3.0)
         self.delta_x = rospy.get_param("~delta_x", 0.0)
         self.delta_y = rospy.get_param("~delta_y", 0) * math.pi/180.0
-        self.velocity = rospy.get_param("~velocity", 0.020)
+        self.velocity = rospy.get_param("~velocity", 0.018)
         self.orientation_offset = rospy.get_param("~orientation_offset", 0) * math.pi/180.0 
         self.number_of_points = rospy.get_param("~number_of_points", 2000)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
