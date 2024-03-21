@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="TCP_pose_topic"         default="/mur620b/UR10_r/global_tcp_pose" />
+  <arg name="TCP_pose_topic"         default="/mur620a/UR10_r/global_tcp_pose" />
   <arg name="set_object_pose_topic"  default="/virtual_object/set_pose" />
   <arg name="relative_pose"          default="[-0.5, -1.0, 0.0, 0.0, 0.0, 0.0]" />
 
