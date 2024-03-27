@@ -25,6 +25,8 @@ class LissajousResponsePublisher:
         self.delta_y = rospy.get_param("~delta_y", 0.0)
         self.delta_z = rospy.get_param("~delta_z", 0.0)
         self.velocity = rospy.get_param("~velocity", 0.0005)
+        self.end_point_tolerance = rospy.get_param("~end_point_tolerance", 0.01)
+        self.number_of_loops = rospy.get_param("~number_of_loops", 20)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_object/object_cmd_vel")
 
@@ -34,6 +36,8 @@ class LissajousResponsePublisher:
         self.config()
         self.path_out = Path()
         self.path_out.header.frame_id = "map"
+        self.initial_pose = PoseStamped()
+        self.run_counter = 0
         
 
         self.cmd_publisher = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=10)
@@ -65,6 +69,8 @@ class LissajousResponsePublisher:
         # compute velocity commands
         twist = Twist()
 
+        self.initial_pose.pose = self.path_out.poses[0].pose
+
         # compute the target velocity by differentiating the lissajous curve
         self.cmd = Twist()
 
@@ -86,6 +92,15 @@ class LissajousResponsePublisher:
 
             self.cmd_publisher.publish(self.cmd)
             rate.sleep()
+
+            # compute distance to initial pose to determine when to stop
+            distance = math.sqrt((self.initial_pose.pose.position.x - self.path_out.poses[i].pose.position.x)**2 + (self.initial_pose.pose.position.y - self.path_out.poses[i].pose.position.y)**2 + (self.initial_pose.pose.position.z - self.path_out.poses[i].pose.position.z)**2)
+
+            if distance < self.end_point_tolerance and i > 100 and self.run_counter >= self.number_of_loops:
+                self.run_counter += 1
+                rospy.loginfo("Reached end point")
+                break
+
             if rospy.is_shutdown():
                 break
 
