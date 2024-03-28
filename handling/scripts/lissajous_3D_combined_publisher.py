@@ -15,9 +15,9 @@ from tf import broadcaster
 class LissajousResponsePublisher:
 
     def config(self):
-        self.a = rospy.get_param("~a", 0.27)
-        self.b = rospy.get_param("~b", 0.27)
-        self.c = rospy.get_param("~c", 0.4)
+        self.a = rospy.get_param("~a", 0.15)
+        self.b = rospy.get_param("~b", 0.15)
+        self.c = rospy.get_param("~c", 0.2)
         self.omega_x = rospy.get_param("~omega_x", 2.0)
         self.omega_y = rospy.get_param("~omega_y", 3.0)
         self.omega_z = rospy.get_param("~omega_z", 4.0)
@@ -26,7 +26,7 @@ class LissajousResponsePublisher:
         self.delta_z = rospy.get_param("~delta_z", 0.0)
         self.velocity = rospy.get_param("~velocity", 0.0005)
         self.end_point_tolerance = rospy.get_param("~end_point_tolerance", 0.01)
-        self.number_of_loops = rospy.get_param("~number_of_loops", 40)
+        self.number_of_loops = rospy.get_param("~number_of_loops", 8)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_object/object_cmd_vel")
         self.object_pose_topic = rospy.get_param("~object_pose_topic", "/virtual_object/object_pose")
@@ -52,7 +52,7 @@ class LissajousResponsePublisher:
         seq = 0
         pose_stamped = PoseStamped()
         pose_stamped.header.frame_id = "map"
-        for t in range(0, int(10 / self.velocity)):
+        for t in range(0, int(30 / self.velocity)):
             pose_stamped.header.stamp = rospy.Time.now()
             pose_stamped.pose.position.x = self.a * math.sin(self.omega_x * t * self.velocity) + self.delta_x + object_pose.pose.position.x
             pose_stamped.pose.position.y = self.b * math.sin(self.omega_y * t * self.velocity) + self.delta_y + object_pose.pose.position.y
@@ -89,6 +89,9 @@ class LissajousResponsePublisher:
             self.cmd.linear.x = dx / sleep_dur 
             self.cmd.linear.y = dy / sleep_dur 
             self.cmd.linear.z = dz / sleep_dur 
+            self.cmd.angular.x = dx / sleep_dur * 2.0
+            self.cmd.angular.y = dy / sleep_dur * 2.0
+            self.cmd.angular.z = dz / sleep_dur * 0.6
 
             # broadcast the target pose
             br = broadcaster.TransformBroadcaster()
@@ -100,10 +103,12 @@ class LissajousResponsePublisher:
             # compute distance to initial pose to determine when to stop
             distance = math.sqrt((self.initial_pose.pose.position.x - self.path_out.poses[i].pose.position.x)**2 + (self.initial_pose.pose.position.y - self.path_out.poses[i].pose.position.y)**2 + (self.initial_pose.pose.position.z - self.path_out.poses[i].pose.position.z)**2)
 
-            # if distance < self.end_point_tolerance and i > 100 and self.run_counter >= self.number_of_loops:
-            #     self.run_counter += 1
-            #     rospy.loginfo("Reached end point")
-            #     break
+            if distance < self.end_point_tolerance and i > 100 and self.run_counter >= self.number_of_loops:
+                rospy.loginfo("Reached end point")
+                break
+            elif distance < self.end_point_tolerance and i > 100:
+                self.run_counter += 1
+                rospy.loginfo("Loop " + str(self.run_counter) + " completed")
 
             if rospy.is_shutdown():
                 break
