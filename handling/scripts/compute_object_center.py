@@ -7,6 +7,7 @@ import tf
 import numpy as np
 from geometry_msgs.msg import PoseStamped, Pose
 from tf import transformations
+import math
 
 
 class ComputeObjectCenter:
@@ -71,9 +72,11 @@ class ComputeObjectCenter:
         
 
 
-
-
-
+        # rotate the quaternion about its x-axis by 180 degrees
+        euler = transformations.euler_from_quaternion(object_orientation)
+        object_orientation = transformations.quaternion_from_euler(euler[0] + math.pi, euler[1], euler[2])
+        # rotate the quaternion about its z-axis by - 90 degrees
+        object_orientation = transformations.quaternion_multiply(object_orientation, transformations.quaternion_from_euler(0, 0, -math.pi / 2))
 
 
         # publish object center
@@ -83,14 +86,14 @@ class ComputeObjectCenter:
         object_pose.pose.position.x = object_center[0]
         object_pose.pose.position.y = object_center[1]
         object_pose.pose.position.z = object_center[2]
-        # object_pose.pose.orientation.x = object_orientation[0]
-        # object_pose.pose.orientation.y = object_orientation[1]
-        # object_pose.pose.orientation.z = object_orientation[2]
-        # object_pose.pose.orientation.w = object_orientation[3]
-        object_pose.pose.orientation.x = 0
-        object_pose.pose.orientation.y = 0
-        object_pose.pose.orientation.z = 0
-        object_pose.pose.orientation.w = 1
+        object_pose.pose.orientation.x = object_orientation[0]
+        object_pose.pose.orientation.y = object_orientation[1]
+        object_pose.pose.orientation.z = object_orientation[2]
+        object_pose.pose.orientation.w = object_orientation[3]
+        # object_pose.pose.orientation.x = 0
+        # object_pose.pose.orientation.y = 0
+        # object_pose.pose.orientation.z = 0
+        # object_pose.pose.orientation.w = 1
         self.object_pose_pub.publish(object_pose)
         rospy.sleep(1)
 
