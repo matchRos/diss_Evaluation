@@ -24,7 +24,7 @@ class LissajousResponsePublisher:
         self.delta_x = rospy.get_param("~delta_x", 0.0)
         self.delta_y = rospy.get_param("~delta_y", 0.0)
         self.delta_z = rospy.get_param("~delta_z", 0.0)
-        self.velocity = rospy.get_param("~velocity", 0.0005)
+        self.velocity = rospy.get_param("~velocity", 0.0006)
         self.end_point_tolerance = rospy.get_param("~end_point_tolerance", 0.01)
         self.number_of_loops = rospy.get_param("~number_of_loops", 40)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
