@@ -27,7 +27,8 @@ class EnableAllURs:
             for UR_prefix in self.UR_prefixes:
                 topic = "/" + robot_name + "/" + UR_prefix + "/ur_hardware_interface"
                 print("Enabling " + topic)
-                process = self.launch_ros_node(self.node_name, self.launch_pkg, self.node_name + '.py', "/" + robot_name, "" , ur_hardware_interface_topic=topic)
+                namespace = "/" + robot_name + "/" + UR_prefix + "/"
+                process = self.launch_ros_node(self.node_name, self.launch_pkg, self.node_name + '.py', namespace, '' , ur_hardware_interface_topic=topic)
                 # check if the node is still running
                 while process.is_alive() and not rospy.is_shutdown():
                     rospy.sleep(1)
@@ -40,7 +41,9 @@ class EnableAllURs:
         # get param names from kwargs
         param_names = params.keys()
         # set params on param server
+        print("Setting params for node: " + namespace + node_name)
         for param_name in param_names:
+            print("Setting param: " + namespace + node_name + "/" + param_name + " to " + str(params[param_name]))
             rospy.set_param(namespace + node_name + "/" + param_name, params[param_name])
 
         package = package_name
