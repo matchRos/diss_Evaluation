@@ -26,7 +26,7 @@ class LissajousResponsePublisher:
         self.delta_z = rospy.get_param("~delta_z", 0.0)
         self.velocity = rospy.get_param("~velocity", 0.0005)
         self.end_point_tolerance = rospy.get_param("~end_point_tolerance", 0.01)
-        self.number_of_loops = rospy.get_param("~number_of_loops", 8)
+        self.number_of_loops = rospy.get_param("~number_of_loops", 6)
         self.lissajous_path_topic = rospy.get_param("~lissajous_path_topic", "/lissajous_path")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_object/object_cmd_vel")
         self.object_pose_topic = rospy.get_param("~object_pose_topic", "/virtual_object/object_pose")
@@ -39,6 +39,7 @@ class LissajousResponsePublisher:
         self.path_out.header.frame_id = "map"
         self.initial_pose = PoseStamped()
         self.run_counter = 0
+        self.close_to_end_point = False
         
         self.cmd_publisher = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=10)
         self.path_publisher = rospy.Publisher(self.lissajous_path_topic, Path, queue_size=10, latch=True)
@@ -103,12 +104,15 @@ class LissajousResponsePublisher:
             # compute distance to initial pose to determine when to stop
             distance = math.sqrt((self.initial_pose.pose.position.x - self.path_out.poses[i].pose.position.x)**2 + (self.initial_pose.pose.position.y - self.path_out.poses[i].pose.position.y)**2 + (self.initial_pose.pose.position.z - self.path_out.poses[i].pose.position.z)**2)
 
-            if distance < self.end_point_tolerance and i > 100 and self.run_counter >= self.number_of_loops:
+            if distance < self.end_point_tolerance and i > 100 and self.run_counter >= self.number_of_loops and self.close_to_end_point == False:
                 rospy.loginfo("Reached end point")
                 break
-            elif distance < self.end_point_tolerance and i > 100:
+            elif distance < self.end_point_tolerance and i > 100 and self.close_to_end_point == False:
                 self.run_counter += 1
                 rospy.loginfo("Loop " + str(self.run_counter) + " completed")
+                self.close_to_end_point = True
+            elif distance > self.end_point_tolerance:
+                self.close_to_end_point = False
 
             if rospy.is_shutdown():
                 break
