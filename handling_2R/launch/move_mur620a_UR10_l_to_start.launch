@@ -1,0 +1,21 @@
+<launch>
+
+  <arg name="UR_prefix" default="UR10_l"/>
+  <arg name="tf_prefix" default="mur620a"/>
+  <arg name="home_position" default="handling_position_wide"/>
+  <arg name="move_group_name" default="UR_arm_l"/>
+
+  <!-- enable UR -->
+  <node name="UR_enable" pkg="ur_utilities" type="UR_enable.py" output="screen">
+      <param name="ur_hardware_interface_topic" value="$(arg tf_prefix)/$(arg UR_prefix)/ur_hardware_interface/set_mode" />
+  </node>
+
+  <include file="$(find ur_utilities)/launch/move_UR_to_home_pose_l.launch">
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="UR_prefix" value="$(arg UR_prefix)" />
+    <arg name="home_position" value="$(arg home_position)" />
+    <arg name="move_group_name" value="$(arg move_group_name)" />
+  </include>
+
+
+</launch>

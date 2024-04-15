@@ -1,0 +1,13 @@
+<launch>
+
+  <arg name="TCP_pose_topic"         default="/mur620a/UR10_r/global_tcp_pose" />
+  <arg name="set_object_pose_topic"  default="/virtual_object/set_pose" />
+  <arg name="relative_pose"          default="[-0.52, 0.0, 0.0, 0.0, 0.0, 0.0]" />
+
+  <include file="$(find virtual_object)/launch/set_virtual_object.launch">
+    <arg name="TCP_pose_topic" value="$(arg TCP_pose_topic)" />
+    <arg name="set_object_pose_topic" value="$(arg set_object_pose_topic)" />
+    <arg name="relative_pose" value="$(arg relative_pose)" />
+  </include>
+
+</launch>
