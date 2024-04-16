@@ -10,7 +10,7 @@ from std_srvs.srv import Trigger, TriggerRequest
 class ZeroAllFTSensors:
     
     def config(self):
-        self.robot_names = rospy.get_param('~robot_names', ['mur620a', 'mur620d'])
+        self.robot_names = rospy.get_param('~robot_names', ['mur620a','mur620b','mur620c', 'mur620d'])
         self.UR_prefixes = rospy.get_param('~UR_prefixes', ['UR10_l', 'UR10_r'])
 
 
