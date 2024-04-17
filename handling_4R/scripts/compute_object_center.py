@@ -20,7 +20,7 @@ class ComputeObjectCenter:
 
     def __init__(self):
         self.config()
-        self.robot_poses = [[None, None], [None, None]]
+        self.robot_poses = [[None, None] for i in range(len(self.robot_names))]
 
         self.object_pose_pub = rospy.Publisher(self.set_object_pose_topic, PoseStamped, queue_size=1)
         # subscribe to the pose topics of the robots

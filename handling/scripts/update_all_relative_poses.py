@@ -10,7 +10,7 @@ import roslaunch
 class UpdateAllRelativePoses:
     
     def config(self):
-        self.robot_names = rospy.get_param('~robot_names', ['mur620a', 'mur620d'])
+        self.robot_names = rospy.get_param('~robot_names', ['mur620a', 'mur620b', 'mur620c', 'mur620d'])
         self.UR_prefixes = rospy.get_param('~UR_prefixes', ['UR10_l', 'UR10_r'])
         self.node_name = rospy.get_param('~node_name', 'update_relative_pose')
         self.launch_pkg = rospy.get_param('~launch_pkg', 'manipulator_control')
