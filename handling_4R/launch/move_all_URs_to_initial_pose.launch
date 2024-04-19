@@ -1,0 +1,46 @@
+<launch>
+
+    <arg name="UR_prefix_l" default="UR10_l"/>
+    <arg name="UR_prefix_r" default="UR10_r"/>
+    <arg name="robot1_prefix" default="mur620a"/>
+    <arg name="robot2_prefix" default="mur620b"/>
+    <arg name="robot3_prefix" default="mur620c"/>
+    <arg name="robot4_prefix" default="mur620d"/>
+    <arg name="home_position" default="handling_position"/>
+    <arg name="move_group_name" default="UR_arm_l"/>
+
+
+
+    <group ns = "$(arg robot1_prefix)">
+
+        <group ns = "$(arg UR_prefix_l)">
+
+            <include file="$(find ur_utilities)/launch/move_UR_to_home_pose.launch">
+                <arg name="tf_prefix" value="$(arg robot1_prefix)" />
+                <arg name="UR_prefix" value="$(arg UR_prefix_l)" />
+                <arg name="home_position" value="handling_position_wide" />
+                <arg name="move_group_name" value="$(arg move_group_name)" />
+            </include>
+
+        </group>
+
+        <group ns = "$(arg UR_prefix_r)">
+
+            <include file="$(find ur_utilities)/launch/move_UR_to_home_pose.launch">
+                <arg name="tf_prefix" value="$(arg robot1_prefix)" />
+                <arg name="UR_prefix" value="$(arg UR_prefix_r)" />
+                <arg name="home_position" value="handling_position_wide" />
+                <arg name="move_group_name" value="$(arg move_group_name)" />
+            </include>
+
+        </group>
+
+
+    </group>
+
+ 
+
+  
+
+
+</launch>

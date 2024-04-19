@@ -28,7 +28,7 @@ class TurnOnAllTwistControllers:
                 rospy.loginfo("Loading " + self.controller_name + " for " + robot_name + "/" + UR_prefix)
                 load_controller_request = LoadControllerRequest()
                 load_controller_request.name = self.controller_name
-                #load_controller_client(load_controller_request)
+                load_controller_client(load_controller_request)
                 rospy.loginfo("Loaded " + self.controller_name + " for " + robot_name + "/" + UR_prefix)
 
 
