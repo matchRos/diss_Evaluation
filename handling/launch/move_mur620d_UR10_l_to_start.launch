@@ -2,7 +2,7 @@
 
   <arg name="UR_prefix" default="UR10_l"/>
   <arg name="tf_prefix" default="mur620d"/>
-  <arg name="home_position" default="handling_position"/>
+  <arg name="home_position" default="handling_position_wide_lift"/>
   <arg name="move_group_name" default="UR_arm_l"/>
 
   <!-- enable UR -->
