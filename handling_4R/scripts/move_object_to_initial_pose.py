@@ -8,7 +8,7 @@ from tf import transformations
 
 class MoveObjectToInitialPose:
     def config(self):
-        self.initial_pose = rospy.get_param("~initial_pose", [37.228911066613534, 35.45825474856077, 1.05, 0, 0, 0, 1])
+        self.initial_pose = rospy.get_param("~initial_pose", [37.228911066613534, 35.45825474856077, 0.98, 0, 0, 0, 1])
         self.currecnt_pose_topic = rospy.get_param("~current_pose_topic", "/virtual_object/object_pose")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_object/object_cmd_vel")
         self.max_velocity = rospy.get_param("~velocity", 0.05)
