@@ -2,7 +2,7 @@
 
   <arg name="tf_prefix"         default="mur620d" />
   <arg name="UR_prefix"  default="UR10_l" />
-  <arg name="relative_pose"          default="[-1.4209302377053348, -0.5714256526518753, 0.03, 0.0, 3.14159265359, 3.14159265359]" />
+  <arg name="relative_pose"          default="[-1.4015982334518426, -0.6143848849080911, -0.008208334909031445, 0.0, 3.14159265359, 3.14159265359]" />
   <!-- <arg name="admittance" default="[0.0,0.0,0.001,0.0,0.0,0.0]" /> -->
 
   <include file="$(find manipulator_control)/launch/dezentralized_admittance_controller.launch">
