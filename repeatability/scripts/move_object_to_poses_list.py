@@ -14,24 +14,24 @@ class MoveObjectToInitialPose:
         self.poses_list = rospy.get_param("~poses_list", [])
 
         for i in range(self.repetitions):
-            offset = [0.0, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
-            self.offset_and_add_poses(self.initial_pose, offset,i)
-            offset = [0.0, 0.0 , 0.1, 0.0, 0.0, 0.0, 0.0]
-            self.offset_and_add_poses(self.initial_pose, offset,i)
-            offset = [0.1, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
-            self.offset_and_add_poses(self.initial_pose, offset,i)
-            offset = [0.0, 0.1 , 0.0, 0.0, 0.0, 0.0, 0.0]
+            # offset = [0.0, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
+            # self.offset_and_add_poses(self.initial_pose, offset,i)
+            # offset = [0.0, 0.0 , 0.1, 0.0, 0.0, 0.0, 0.0]
+            # self.offset_and_add_poses(self.initial_pose, offset,i)
+            # offset = [0.1, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
+            # self.offset_and_add_poses(self.initial_pose, offset,i)
+            offset = [0.1, 0.1 , 0.1, 0.0, 0.0, 0.0, 0.0]
             self.offset_and_add_poses(self.initial_pose, offset,i)
             offset = [-0.2, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
             self.offset_and_add_poses(self.initial_pose, offset,i)
             offset = [0.0, -0.2 , 0.0, 0.0, 0.0, 0.0, 0.0]
             self.offset_and_add_poses(self.initial_pose, offset,i)
-            offset = [0.0, 0.0 , -0.2, 0.0, 0.0, 0.0, 0.0]
-            self.offset_and_add_poses(self.initial_pose, offset,i)
-            offset = [0.2, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
-            self.offset_and_add_poses(self.initial_pose, offset,i)
-            offset = [0.0, 0.2 , 0.0, 0.0, 0.0, 0.0, 0.0]
-            self.offset_and_add_poses(self.initial_pose, offset,i)
+            # offset = [0.0, 0.0 , -0.2, 0.0, 0.0, 0.0, 0.0]
+            # self.offset_and_add_poses(self.initial_pose, offset,i)
+            # offset = [0.2, 0.0 , 0.0, 0.0, 0.0, 0.0, 0.0]
+            # self.offset_and_add_poses(self.initial_pose, offset,i)
+            # offset = [0.0, 0.2 , 0.0, 0.0, 0.0, 0.0, 0.0]
+            # self.offset_and_add_poses(self.initial_pose, offset,i)
 
             
         # print("Poses list: ", self.poses_list)
@@ -54,17 +54,17 @@ class MoveObjectToInitialPose:
 
     def config(self):
         self.initial_pose = [36.99933238093275,36.63378957278167,1.3265077455433467,-0.00039379802380474864,0.0032322841463110884,-0.007039548363270753,-0.9999699205581911]
-        self.repetitions = rospy.get_param("~repetitions", 3)
+        self.repetitions = rospy.get_param("~repetitions", 30)
         self.currecnt_pose_topic = rospy.get_param("~current_pose_topic", "/virtual_object/object_pose")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_object/object_cmd_vel")
         self.actual_object_pose_topic = rospy.get_param("~actual_object_pose_topic", "/qualisys/match_tuch/pose")
-        self.max_velocity = rospy.get_param("~velocity", 0.02)
-        self.max_acceleration = rospy.get_param("~acceleration", 0.002)
-        self.Kp_linear = rospy.get_param("~Kp_linear", 0.4)
-        self.Kp_angular = rospy.get_param("~Kp_angular", 0.4)
+        self.max_velocity = rospy.get_param("~velocity", 0.07)
+        self.max_acceleration = rospy.get_param("~acceleration", 0.010)
+        self.Kp_linear = rospy.get_param("~Kp_linear", 1.0)
+        self.Kp_angular = rospy.get_param("~Kp_angular", 0.5)
         self.rate = rospy.get_param("~rate", 100)
         self.target_tolerance = rospy.get_param("~target_tolerance", 0.002)
-        self.object_pose_filter_gain = rospy.get_param("~object_pose_filter_gain", 0.02)
+        self.object_pose_filter_gain = rospy.get_param("~object_pose_filter_gain", 0.03)
         self.poses_list_config()
         pass
 
@@ -172,7 +172,7 @@ class MoveObjectToInitialPose:
         # wait for the object to stop and for the mocap to stabilize (average the mocap pose for 3 second)
         rospy.sleep(3)
         # measure the object pose
-        print("Measured object pose: ", self.object_pose_filtered)
+        #print("Measured object pose: ", self.object_pose_filtered)
 
         # save the measured pose to pose array 
         self.x_position_array[self.poses_measured_couter][self.current_repetition] = self.object_pose_filtered.position.x
@@ -183,12 +183,22 @@ class MoveObjectToInitialPose:
         self.z_orientation_array[self.poses_measured_couter][self.current_repetition] = self.object_pose_filtered.orientation.z
         self.w_orientation_array[self.poses_measured_couter][self.current_repetition] = self.object_pose_filtered.orientation.w
 
-        print("X position array: ", self.x_position_array)
+
 
         self.poses_measured_couter += 1
         if self.poses_measured_couter == self.number_of_unique_poses:
             self.poses_measured_couter = 0
             self.current_repetition += 1
+
+            print("X position array: ", self.x_position_array)
+            print("Y position array: ", self.y_position_array)
+            print("Z position array: ", self.z_position_array)
+            print("X orientation array: ", self.x_orientation_array)
+            print("Y orientation array: ", self.y_orientation_array)
+            print("Z orientation array: ", self.z_orientation_array)
+            print("W orientation array: ", self.w_orientation_array)
+            print("\n")
+
             # if self.current_repetition == self.repetitions:
             #     rospy.signal_shutdown("All poses measured")
 

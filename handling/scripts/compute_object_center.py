@@ -13,7 +13,7 @@ import math
 class ComputeObjectCenter:
 
     def config(self):
-        self.robot_names = rospy.get_param('~robot_names', ['mur620a', 'mur620d'])
+        self.robot_names = rospy.get_param('~robot_names', ['mur620b'])
         self.ur_l_prefix = rospy.get_param('~UR_l_prefix', 'UR10_l')
         self.ur_r_prefix = rospy.get_param('~UR_r_prefix', 'UR10_r')
         self.set_object_pose_topic = rospy.get_param('~set_object_pose_topic', '/virtual_object/set_pose')
@@ -23,6 +23,7 @@ class ComputeObjectCenter:
         self.robot_poses = [[None, None], [None, None]]
 
         self.object_pose_pub = rospy.Publisher(self.set_object_pose_topic, PoseStamped, queue_size=1)
+        rospy.sleep(1) # wait for publisher to be registered
         # subscribe to the pose topics of the robots
         for i in range(len(self.robot_names)):
             rospy.Subscriber('/' + self.robot_names[i] + '/' + self.ur_l_prefix + '/global_tcp_pose', PoseStamped, self.robot_pose_callback, [i, 0])
