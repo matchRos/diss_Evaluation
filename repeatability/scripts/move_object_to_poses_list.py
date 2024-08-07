@@ -53,13 +53,13 @@ class MoveObjectToInitialPose:
             self.number_of_unique_poses += 1
 
     def config(self):
-        self.initial_pose = [36.99933238093275,36.63378957278167,1.3265077455433467,-0.00039379802380474864,0.0032322841463110884,-0.007039548363270753,-0.9999699205581911]
+        self.initial_pose = [38.076052036169834,36.26492525592788,1.3265077455433467,0.0005985702752439381,-0.0004137341211913332,-0.6975467561235352,0.7165388988458588]
         self.repetitions = rospy.get_param("~repetitions", 30)
         self.currecnt_pose_topic = rospy.get_param("~current_pose_topic", "/virtual_object/object_pose")
         self.cmd_vel_topic = rospy.get_param("~cmd_vel_topic", "/virtual_object/object_cmd_vel")
-        self.actual_object_pose_topic = rospy.get_param("~actual_object_pose_topic", "/qualisys/match_tuch/pose")
-        self.max_velocity = rospy.get_param("~velocity", 0.07)
-        self.max_acceleration = rospy.get_param("~acceleration", 0.010)
+        self.actual_object_pose_topic = rospy.get_param("~actual_object_pose_topic", "/qualisys/brettchen/pose")
+        self.max_velocity = rospy.get_param("~velocity", 0.17)
+        self.max_acceleration = rospy.get_param("~acceleration", 0.020)
         self.Kp_linear = rospy.get_param("~Kp_linear", 1.0)
         self.Kp_angular = rospy.get_param("~Kp_angular", 0.5)
         self.rate = rospy.get_param("~rate", 100)
