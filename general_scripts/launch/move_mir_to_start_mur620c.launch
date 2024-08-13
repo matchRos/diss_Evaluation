@@ -1,9 +1,9 @@
 <launch>
 
     <!-- Defining arguments for the mur launch -->
-    <arg name="target_pose" default='[36.06,35.75,0]'/>
+    <arg name="target_pose" default='[32.00,36.0,0]'/>
 
-    <node name="move_mir_to_start_pose" pkg="general_scripts" type="move_mir_to_start_pose.py" output="screen">
+    <node name="move_mir_to_start_pose_c" pkg="general_scripts" type="move_mir_to_start_pose.py" output="screen">
         <rosparam param="target_pose" subst_value="True">$(arg target_pose) </rosparam>
         <param name="tf_prefix" value="mur620c"/>
     </node>
