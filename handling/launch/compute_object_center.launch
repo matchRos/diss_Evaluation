@@ -1,0 +1,8 @@
+<launch>
+    <!-- Argument für die Liste der Roboter -->
+    <arg name="robot_names" default="[]" />
+
+    <node pkg="handling" type="compute_object_center.py" name="compute_object_center" output="screen">
+        <rosparam param="robot_names" subst_value="True">$(arg robot_names) </rosparam>
+    </node>
+</launch>

@@ -75,13 +75,21 @@ class ROSGui(QWidget):
         subprocess.Popen(command, shell=True)
 
     def run_compute_object_center(self):
-        """Startet compute_object_center.py mit den gewählten Robotern als Parameter."""
+        """Startet compute_object_center.launch mit den gewählten Robotern als Parameter."""
         selected_robots = self.get_selected_robots()
-        robot_names_str = ",".join(selected_robots)
 
-        command = f"rosrun handling compute_object_center.py _robot_names:={robot_names_str}"
+        if not selected_robots:
+            print("No robots selected. Skipping launch.")
+            return
+
+        # Korrektes String-Format für ROS-Parameter: '["mur620a", "mur620b", "mur620c"]'
+        robot_names_str = '"' + str(selected_robots).replace("'", '"') + '"'
+
+        command = f"roslaunch handling compute_object_center.launch robot_names:={robot_names_str}"
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
+
+
 
     def launch_drivers(self):
         """SSH zu den ausgewählten Robotern und starte die Treiber in separaten Terminals."""
