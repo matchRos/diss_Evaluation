@@ -6,7 +6,7 @@ class ROSGui(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Multi-Robot Demo")
-        self.setGeometry(100, 100, 300, 200)
+        self.setGeometry(100, 100, 350, 250)
 
         self.layout = QVBoxLayout()
 
@@ -23,13 +23,17 @@ class ROSGui(QWidget):
 
         # Buttons für das Starten der ROS-Launch-Files
         self.btn_virtual_leader = QPushButton("Start Virtual Leader")
-        self.btn_virtual_leader.clicked.connect(lambda: self.launch_ros("virtual_leader.launch"))
+        self.btn_virtual_leader.clicked.connect(lambda: self.launch_ros("virtual_leader", "virtual_leader.launch"))
 
         self.btn_virtual_object = QPushButton("Start Virtual Object")
-        self.btn_virtual_object.clicked.connect(lambda: self.launch_ros("virtual_object.launch"))
+        self.btn_virtual_object.clicked.connect(lambda: self.launch_ros("virtual_object", "virtual_object.launch"))
+
+        self.btn_compute_center = QPushButton("Start Compute Object Center")
+        self.btn_compute_center.clicked.connect(self.run_compute_object_center)
 
         self.layout.addWidget(self.btn_virtual_leader)
         self.layout.addWidget(self.btn_virtual_object)
+        self.layout.addWidget(self.btn_compute_center)
 
         self.setLayout(self.layout)
 
@@ -37,12 +41,21 @@ class ROSGui(QWidget):
         """Liest die aktivierten Roboter aus und gibt sie als Liste zurück."""
         return [name for name, checkbox in self.robots.items() if checkbox.isChecked()]
 
-    def launch_ros(self, launch_file):
+    def launch_ros(self, package, launch_file):
         """Startet ein ROS-Launch-File mit dynamischen Parametern."""
         selected_robots = self.get_selected_robots()
         robot_names_str = "[" + ",".join(f"'{r}'" for r in selected_robots) + "]"
 
-        command = f"roslaunch virtual_leader {launch_file} robot_names:={robot_names_str}"
+        command = f"roslaunch {package} {launch_file} robot_names:={robot_names_str}"
+        print(f"Executing: {command}")
+        subprocess.Popen(command, shell=True)
+
+    def run_compute_object_center(self):
+        """Startet compute_object_center.py mit den gewählten Robotern als Parameter."""
+        selected_robots = self.get_selected_robots()
+        robot_names_str = ",".join(selected_robots)
+
+        command = f"rosrun handling compute_object_center.py _robot_names:={robot_names_str}"
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
 
