@@ -7,6 +7,7 @@ class ROSGui(QWidget):
         super().__init__()
         self.setWindowTitle("Multi-Robot Demo")
         self.setGeometry(100, 100, 400, 400)
+        self.workspace_name = "catkin_ws_recker"
 
         self.layout = QVBoxLayout()
 
@@ -92,22 +93,24 @@ class ROSGui(QWidget):
 
 
     def launch_drivers(self):
-        """SSH zu den ausgewählten Robotern und starte die Treiber in separaten Terminals."""
+        """SSH zu den ausgewählten Robotern und starte die Treiber in separaten Terminals, aber halte das Terminal offen."""
         selected_robots = self.get_selected_robots()
 
         for robot in selected_robots:
-            command = f"ssh {robot} 'source /opt/ros/noetic/setup.bash && source ~/catkin_ws_recker/devel/setup.bash && roslaunch mur_launch_hardware {robot}.launch; exec bash'"
-            print(f"Executing SSH Command: {command}")
+            # Verwende die Variable self.workspace_name für den Workspace
+            workspace = self.workspace_name
 
-            # Terminal starten und SSH-Session offen halten
-            process = subprocess.Popen(
-                ["terminator", "-e", f"bash -c \"{command}; exec bash\""],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
+            command = f"ssh -t -t {robot} 'source ~/.bashrc; source /opt/ros/noetic/setup.bash; source ~/{workspace}/devel/setup.bash; roslaunch mur_launch_hardware {robot}.launch; exec bash'"
+            print(f"Opening SSH session and launching driver for: {robot}")
 
-            # Prozess speichern, um ihn später beenden zu können
-            self.driver_processes.append(process)
+            # Neues Terminal öffnen mit SSH-Session + Treiberstart + offen halten
+            subprocess.Popen(["gnome-terminal", "--", "bash", "-c", f"{command}; exec bash"])
+
+
+
+
+
+
 
     def quit_drivers(self):
         """Beendet alle laufenden SSH-Sitzungen."""
