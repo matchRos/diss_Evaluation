@@ -101,7 +101,7 @@ class ROSGui(QWidget):
 
             # Terminal starten und SSH-Session offen halten
             process = subprocess.Popen(
-                ["terminator", "-e", f"bash -c '{command}; exec bash'"],
+                ["terminator", "-e", f"bash -c \"{command}; exec bash\""],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
