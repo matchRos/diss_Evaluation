@@ -60,6 +60,15 @@ class ROSGui(QWidget):
         self.btn_zero_ft_sensors = QPushButton("Zero F/T Sensors")
         self.btn_zero_ft_sensors.clicked.connect(self.zero_ft_sensors)
 
+        self.btn_turn_on_wrench = QPushButton("Turn on Wrench Controllers")
+        self.btn_turn_on_wrench.clicked.connect(self.turn_on_wrench_controllers)
+
+        self.btn_turn_on_arm = QPushButton("Turn on Arm Controllers")
+        self.btn_turn_on_arm.clicked.connect(self.turn_on_arm_controllers)
+
+        self.btn_turn_on_twist = QPushButton("Turn on Twist Controllers")
+        self.btn_turn_on_twist.clicked.connect(self.turn_on_twist_controllers)
+
         # Buttons for Initial Pose (left & right)
         move_pose_layout = QHBoxLayout()
         self.btn_move_left = QPushButton("Move to Initial Pose Left")
@@ -79,6 +88,9 @@ class ROSGui(QWidget):
         self.layout.addWidget(self.btn_quit_drivers)
         self.layout.addWidget(self.btn_zero_ft_sensors)
         self.layout.addLayout(move_pose_layout)  # Move buttons
+        self.layout.addWidget(self.btn_turn_on_wrench)
+        self.layout.addWidget(self.btn_turn_on_arm)
+        self.layout.addWidget(self.btn_turn_on_twist)
 
         self.setLayout(self.layout)
 
@@ -137,6 +149,55 @@ class ROSGui(QWidget):
         command = f"roslaunch handling zero_all_FT_sensors.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
+
+    def turn_on_wrench_controllers(self):
+        """Turns on all wrench controllers for the selected robots."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+
+        if not selected_robots or not selected_urs:
+            print("No robots or URs selected. Skipping launch.")
+            return
+
+        robot_names_str = '"' + str(selected_robots).replace("'", '"') + '"'
+        ur_prefixes_str = '"' + str(selected_urs).replace("'", '"') + '"'
+
+        command = f"roslaunch handling turn_on_all_wrench_controllers.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
+        print(f"Executing: {command}")
+        subprocess.Popen(command, shell=True)
+
+    def turn_on_arm_controllers(self):
+        """Turns on all arm controllers for the selected robots."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+
+        if not selected_robots or not selected_urs:
+            print("No robots or URs selected. Skipping launch.")
+            return
+
+        robot_names_str = '"' + str(selected_robots).replace("'", '"') + '"'
+        ur_prefixes_str = '"' + str(selected_urs).replace("'", '"') + '"'
+
+        command = f"roslaunch handling turn_on_all_arm_controllers.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
+        print(f"Executing: {command}")
+        subprocess.Popen(command, shell=True)
+
+    def turn_on_twist_controllers(self):
+        """Turns on all twist controllers for the selected robots."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+
+        if not selected_robots or not selected_urs:
+            print("No robots or URs selected. Skipping launch.")
+            return
+
+        robot_names_str = '"' + str(selected_robots).replace("'", '"') + '"'
+        ur_prefixes_str = '"' + str(selected_urs).replace("'", '"') + '"'
+
+        command = f"roslaunch handling turn_on_all_twist_controllers.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
+        print(f"Executing: {command}")
+        subprocess.Popen(command, shell=True)
+
 
     def launch_drivers(self):
         """SSH into the selected robots and start the drivers in separate terminals."""
