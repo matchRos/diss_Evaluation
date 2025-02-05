@@ -100,7 +100,7 @@ class ROSGui(QWidget):
             # Verwende die Variable self.workspace_name für den Workspace
             workspace = self.workspace_name
 
-            command = f"ssh -t -t {robot} 'source ~/.bashrc; source /opt/ros/noetic/setup.bash; source ~/{workspace}/devel/setup.bash; roslaunch mur_launch_hardware {robot}.launch; exec bash'"
+            command = f"ssh -t -t {robot} 'source ~/.bashrc; export ROS_MASTER_URI=http://roscore:11311/; source /opt/ros/noetic/setup.bash; source ~/{workspace}/devel/setup.bash; roslaunch mur_launch_hardware {robot}.launch; exec bash'"
             print(f"Opening SSH session and launching driver for: {robot}")
 
             # Neues Terminal öffnen mit SSH-Session + Treiberstart + offen halten
