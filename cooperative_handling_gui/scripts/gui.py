@@ -69,6 +69,12 @@ class ROSGui(QWidget):
         self.btn_turn_on_twist = QPushButton("Turn on Twist Controllers")
         self.btn_turn_on_twist.clicked.connect(self.turn_on_twist_controllers)
 
+        self.btn_enable_all_urs = QPushButton("Enable all URs")
+        self.btn_enable_all_urs.clicked.connect(self.enable_all_urs)
+
+        self.btn_update_ur_relative = QPushButton("Update UR relative to object")
+        self.btn_update_ur_relative.clicked.connect(self.update_ur_relative_to_object)
+
         # Buttons for Initial Pose (left & right)
         move_pose_layout = QHBoxLayout()
         self.btn_move_left = QPushButton("Move to Initial Pose Left")
@@ -91,6 +97,8 @@ class ROSGui(QWidget):
         self.layout.addWidget(self.btn_turn_on_wrench)
         self.layout.addWidget(self.btn_turn_on_arm)
         self.layout.addWidget(self.btn_turn_on_twist)
+        self.layout.addWidget(self.btn_enable_all_urs)
+        self.layout.addWidget(self.btn_update_ur_relative)
 
         self.setLayout(self.layout)
 
@@ -195,6 +203,39 @@ class ROSGui(QWidget):
         ur_prefixes_str = '"' + str(selected_urs).replace("'", '"') + '"'
 
         command = f"roslaunch handling turn_on_all_twist_controllers.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
+        print(f"Executing: {command}")
+        subprocess.Popen(command, shell=True)
+
+        
+    def enable_all_urs(self):
+        """Enables all UR robots for the selected configurations."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+
+        if not selected_robots or not selected_urs:
+            print("No robots or URs selected. Skipping launch.")
+            return
+
+        robot_names_str = '"' + str(selected_robots).replace("'", '"') + '"'
+        ur_prefixes_str = '"' + str(selected_urs).replace("'", '"') + '"'
+
+        command = f"roslaunch handling enable_all_URs.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
+        print(f"Executing: {command}")
+        subprocess.Popen(command, shell=True)
+
+    def update_ur_relative_to_object(self):
+        """Updates the relative poses of UR robots to the object."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+
+        if not selected_robots or not selected_urs:
+            print("No robots or URs selected. Skipping launch.")
+            return
+
+        robot_names_str = '"' + str(selected_robots).replace("'", '"') + '"'
+        ur_prefixes_str = '"' + str(selected_urs).replace("'", '"') + '"'
+
+        command = f"roslaunch handling update_all_relative_poses.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
 
