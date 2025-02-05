@@ -85,6 +85,19 @@ class ROSGui(QWidget):
         move_pose_layout.addWidget(self.btn_move_left)
         move_pose_layout.addWidget(self.btn_move_right)
 
+        # Layout for the cooperative admittance controller button and its checkbox
+        admittance_layout = QHBoxLayout()
+
+        self.btn_coop_admittance = QPushButton("Turn on cooperative Admittance Controller")
+        self.btn_coop_admittance.setStyleSheet("background-color: orange; color: black; font-weight: bold;")  # Highlight button
+        self.btn_coop_admittance.clicked.connect(self.turn_on_coop_admittance_controller)
+
+        self.check_set_reference = QCheckBox("Set reference at runtime")
+        self.check_set_reference.setChecked(True)  # Pre-select checkbox
+
+        admittance_layout.addWidget(self.btn_coop_admittance)
+        admittance_layout.addWidget(self.check_set_reference)
+
         # Add elements to the main layout
         self.layout.addLayout(robot_ur_layout)  # Robot & UR checkboxes
         self.layout.addWidget(self.btn_virtual_leader)
@@ -99,6 +112,7 @@ class ROSGui(QWidget):
         self.layout.addWidget(self.btn_turn_on_twist)
         self.layout.addWidget(self.btn_enable_all_urs)
         self.layout.addWidget(self.btn_update_ur_relative)
+        self.layout.addLayout(admittance_layout)  # Admittance controller
 
         self.setLayout(self.layout)
 
@@ -157,6 +171,25 @@ class ROSGui(QWidget):
         command = f"roslaunch handling zero_all_FT_sensors.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
+
+    def turn_on_coop_admittance_controller(self):
+        """SSH into each selected robot and start the cooperative admittance controller."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+        set_reference = "true" if self.check_set_reference.isChecked() else "false"
+
+        if not selected_robots or not selected_urs:
+            print("No robots or URs selected. Skipping launch.")
+            return
+
+        for robot in selected_robots:
+            for ur_prefix in selected_urs:
+                command = f"ssh -t -t {robot} 'source ~/.bashrc; export ROS_MASTER_URI=http://roscore:11311/; source /opt/ros/noetic/setup.bash; source ~/{self.workspace_name}/devel/setup.bash; roslaunch manipulator_control dezentralized_admittance_controller.launch tf_prefix:={robot} UR_prefix:={ur_prefix} set_reference_at_runtime:={set_reference}; exec bash'"
+                print(f"Executing SSH Command: {command}")
+
+                # Open a new terminal and run the SSH command
+                subprocess.Popen(["gnome-terminal", "--", "bash", "-c", f"{command}; exec bash"])
+
 
     def turn_on_wrench_controllers(self):
         """Turns on all wrench controllers for the selected robots."""
