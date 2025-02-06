@@ -190,38 +190,56 @@ class ROSGui(QWidget):
         subprocess.Popen(command, shell=True)
 
     def update_status(self):
-        """Checks the status of ROS controllers and updates the GUI label."""
-        try:
-            output = subprocess.check_output("rosnode list", shell=True).decode()
-            nodes = output.split("\n")
-            
-            wrench_active = any("wrench_controller" in node for node in nodes)
-            twist_active = any("twist_controller" in node for node in nodes)
-            arm_active = any("arm_controller" in node for node in nodes)
-            admittance_active = any("admittance_controller" in node for node in nodes)
-            
-            status_text = """
-            Wrench Controller: {}
-            Twist Controller: {}
-            Arm Controller: {}
-            Admittance Controller: {}
-            """.format(
-                "✅" if wrench_active else "❌",
-                "✅" if twist_active else "❌",
-                "✅" if arm_active else "❌",
-                "✅" if admittance_active else "❌",
-            )
-            
-            # Special case: Mark Admittance Controller as "active" when Wrench and Twist controllers are running
-            if wrench_active and twist_active:
-                status_text += "\n⚠️ Admittance Controller is ACTIVE! ⚠️"
-                self.status_label.setStyleSheet("background-color: red; color: white; font-weight: bold; padding: 5px;")
-            else:
-                self.status_label.setStyleSheet("border: 1px solid black; padding: 5px;")
-                
-            self.status_label.setText(status_text)
-        except Exception as e:
-            self.status_label.setText(f"Error checking status: {e}")
+        """Checks the status of ROS controllers using the controller_manager service."""
+        selected_robots = self.get_selected_robots()
+        selected_urs = self.get_selected_urs()
+        active_counts = {"wrench": 0, "twist": 0, "arm": 0, "admittance": 0}
+        total_count = len(selected_robots) * len(selected_urs)
+        
+        for robot in selected_robots:
+            for ur in selected_urs:
+                service_name = f"/{robot}/{ur}/controller_manager/list_controllers"
+                try:
+                    output = subprocess.check_output(f"rosservice call {service_name}", shell=True).decode()
+                    if "running" in output:
+                        if "wrench_controller" in output:
+                            active_counts["wrench"] += 1
+                        if "twist_controller" in output:
+                            active_counts["twist"] += 1
+                        if "arm_controller" in output:
+                            active_counts["arm"] += 1
+                        if "admittance_controller" in output:
+                            active_counts["admittance"] += 1
+                except Exception:
+                    pass
+
+        status_text = """
+        Wrench Controller: {} of {} active {}
+        Twist Controller: {} of {} active {}
+        Arm Controller: {} of {} active {}
+        Admittance Controller: {} of {} active {}
+        """.format(
+            active_counts["wrench"], total_count, self.get_status_symbol(active_counts["wrench"], total_count),
+            active_counts["twist"], total_count, self.get_status_symbol(active_counts["twist"], total_count),
+            active_counts["arm"], total_count, self.get_status_symbol(active_counts["arm"], total_count),
+            active_counts["admittance"], total_count, self.get_status_symbol(active_counts["admittance"], total_count),
+        )
+        
+        self.status_label.setText(status_text)
+        
+        # Highlight Admittance Controller if wrench and twist are fully active
+        if active_counts["wrench"] == total_count and active_counts["twist"] == total_count:
+            self.status_label.setStyleSheet("background-color: red; color: white; font-weight: bold; padding: 5px;")
+        else:
+            self.status_label.setStyleSheet("border: 1px solid black; padding: 5px;")
+
+    def get_status_symbol(self, active, total):
+        """Returns appropriate status symbol based on active controller count."""
+        if active == total:
+            return "✅"
+        elif active > 0:
+            return "⚠️"
+        return "❌"
 
 
     def turn_on_coop_admittance_controller(self):
