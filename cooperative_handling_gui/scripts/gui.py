@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import time
+import yaml
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox, QLabel
 from PyQt5.QtCore import QTimer
 
@@ -201,15 +203,18 @@ class ROSGui(QWidget):
                 service_name = f"/{robot}/{ur}/controller_manager/list_controllers"
                 try:
                     output = subprocess.check_output(f"rosservice call {service_name}", shell=True).decode()
-                    if "running" in output:
-                        if "wrench_controller" in output:
-                            active_counts["wrench"] += 1
-                        if "twist_controller" in output:
-                            active_counts["twist"] += 1
-                        if "arm_controller" in output:
-                            active_counts["arm"] += 1
-                        if "admittance_controller" in output:
-                            active_counts["admittance"] += 1
+                    controllers = yaml.safe_load(output).get("controller", [])
+                    
+                    for controller in controllers:
+                        if controller.get("state") == "running":
+                            if controller.get("name") == "force_torque_sensor_controller":
+                                active_counts["wrench"] += 1
+                            if controller.get("name") == "twist_controller":
+                                active_counts["twist"] += 1
+                            if controller.get("name") == "arm_controller":
+                                active_counts["arm"] += 1
+                            if controller.get("name") == "admittance_controller":
+                                active_counts["admittance"] += 1
                 except Exception:
                     pass
 
