@@ -1,6 +1,7 @@
 import sys
 import subprocess
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox, QLabel
+from PyQt5.QtCore import QTimer
 
 class ROSGui(QWidget):
     def __init__(self):
@@ -9,6 +10,17 @@ class ROSGui(QWidget):
         self.setGeometry(100, 100, 400, 450)
         self.workspace_name = "catkin_ws_recker"
         self.layout = QVBoxLayout()
+
+        # Status Anzeige für Controller
+        self.status_label = QLabel("Controller Status: Not Checked")
+        self.status_label.setStyleSheet("border: 1px solid black; padding: 5px;")
+        self.layout.addWidget(self.status_label)
+
+        # Timer zur regelmäßigen Statusprüfung
+        self.status_timer = QTimer()
+        self.status_timer.timeout.connect(self.update_status)
+        self.status_timer.start(3000)  # Alle 3 Sekunden Status abfragen
+
 
         # Layout for robot checkboxes and UR checkboxes side by side
         robot_ur_layout = QHBoxLayout()
@@ -56,6 +68,11 @@ class ROSGui(QWidget):
 
         self.btn_quit_drivers = QPushButton("Quit Drivers")
         self.btn_quit_drivers.clicked.connect(self.quit_drivers)
+
+        self.btn_check_status = QPushButton("Check Status")
+        self.btn_check_status.clicked.connect(self.update_status)
+        self.layout.addWidget(self.btn_check_status)
+
 
         self.btn_zero_ft_sensors = QPushButton("Zero F/T Sensors")
         self.btn_zero_ft_sensors.clicked.connect(self.zero_ft_sensors)
@@ -172,6 +189,41 @@ class ROSGui(QWidget):
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
 
+    def update_status(self):
+        """Überprüft den Status der ROS-Controller und aktualisiert das GUI-Label."""
+        try:
+            output = subprocess.check_output("rosnode list", shell=True).decode()
+            nodes = output.split("\n")
+
+            wrench_active = any("wrench_controller" in node for node in nodes)
+            twist_active = any("twist_controller" in node for node in nodes)
+            arm_active = any("arm_controller" in node for node in nodes)
+            admittance_active = any("admittance_controller" in node for node in nodes)
+
+            status_text = """
+            Wrench Controller: {}
+            Twist Controller: {}
+            Arm Controller: {}
+            Admittance Controller: {}
+            """.format(
+                "✅" if wrench_active else "❌",
+                "✅" if twist_active else "❌",
+                "✅" if arm_active else "❌",
+                "✅" if admittance_active else "❌",
+            )
+
+            # Sonderfall für Admittance Controller scharf setzen
+            if wrench_active and twist_active:
+                status_text += "\n⚠️ Admittance Controller ist SCHARF! ⚠️"
+                self.status_label.setStyleSheet("background-color: red; color: white; font-weight: bold; padding: 5px;")
+            else:
+                self.status_label.setStyleSheet("border: 1px solid black; padding: 5px;")
+
+            self.status_label.setText(status_text)
+        except Exception as e:
+            self.status_label.setText(f"Fehler beim Überprüfen: {e}")
+
+
     def turn_on_coop_admittance_controller(self):
         """SSH into each selected robot and start the cooperative admittance controller."""
         selected_robots = self.get_selected_robots()
@@ -286,14 +338,14 @@ class ROSGui(QWidget):
             subprocess.Popen(["gnome-terminal", "--", "bash", "-c", f"{command}; exec bash"])
 
     def quit_drivers(self):
-        """Stops all running SSH sessions."""
+        """Beendet alle laufenden Driver-Sessions und schließt die Terminals."""
         print("Stopping all driver sessions...")
-        for process in self.driver_processes:
-            try:
-                process.terminate()
-            except Exception as e:
-                print(f"Error stopping process: {e}")
-        self.driver_processes.clear()
+        try:
+            subprocess.Popen("pkill -f 'ssh -t -t'", shell=True)
+            subprocess.Popen("pkill -f 'gnome-terminal'", shell=True)
+        except Exception as e:
+            print(f"Error stopping processes: {e}")
+
 
     def move_to_initial_pose(self, UR_prefix):
         """Moves the selected robots to the initial pose with the correct namespace and move_group_name."""
