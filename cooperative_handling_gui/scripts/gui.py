@@ -11,15 +11,15 @@ class ROSGui(QWidget):
         self.workspace_name = "catkin_ws_recker"
         self.layout = QVBoxLayout()
 
-        # Status Anzeige für Controller
+        # Status display for controllers
         self.status_label = QLabel("Controller Status: Not Checked")
         self.status_label.setStyleSheet("border: 1px solid black; padding: 5px;")
         self.layout.addWidget(self.status_label)
-
-        # Timer zur regelmäßigen Statusprüfung
+        
+        # Timer for periodic status check
         self.status_timer = QTimer()
         self.status_timer.timeout.connect(self.update_status)
-        self.status_timer.start(3000)  # Alle 3 Sekunden Status abfragen
+        self.status_timer.start(3000)  # Check status every 3 seconds
 
 
         # Layout for robot checkboxes and UR checkboxes side by side
@@ -190,16 +190,16 @@ class ROSGui(QWidget):
         subprocess.Popen(command, shell=True)
 
     def update_status(self):
-        """Überprüft den Status der ROS-Controller und aktualisiert das GUI-Label."""
+        """Checks the status of ROS controllers and updates the GUI label."""
         try:
             output = subprocess.check_output("rosnode list", shell=True).decode()
             nodes = output.split("\n")
-
+            
             wrench_active = any("wrench_controller" in node for node in nodes)
             twist_active = any("twist_controller" in node for node in nodes)
             arm_active = any("arm_controller" in node for node in nodes)
             admittance_active = any("admittance_controller" in node for node in nodes)
-
+            
             status_text = """
             Wrench Controller: {}
             Twist Controller: {}
@@ -211,17 +211,17 @@ class ROSGui(QWidget):
                 "✅" if arm_active else "❌",
                 "✅" if admittance_active else "❌",
             )
-
-            # Sonderfall für Admittance Controller scharf setzen
+            
+            # Special case: Mark Admittance Controller as "active" when Wrench and Twist controllers are running
             if wrench_active and twist_active:
-                status_text += "\n⚠️ Admittance Controller ist SCHARF! ⚠️"
+                status_text += "\n⚠️ Admittance Controller is ACTIVE! ⚠️"
                 self.status_label.setStyleSheet("background-color: red; color: white; font-weight: bold; padding: 5px;")
             else:
                 self.status_label.setStyleSheet("border: 1px solid black; padding: 5px;")
-
+                
             self.status_label.setText(status_text)
         except Exception as e:
-            self.status_label.setText(f"Fehler beim Überprüfen: {e}")
+            self.status_label.setText(f"Error checking status: {e}")
 
 
     def turn_on_coop_admittance_controller(self):
@@ -338,7 +338,7 @@ class ROSGui(QWidget):
             subprocess.Popen(["gnome-terminal", "--", "bash", "-c", f"{command}; exec bash"])
 
     def quit_drivers(self):
-        """Beendet alle laufenden Driver-Sessions und schließt die Terminals."""
+        """Terminates all running driver sessions and closes terminals."""
         print("Stopping all driver sessions...")
         try:
             subprocess.Popen("pkill -f 'ssh -t -t'", shell=True)
