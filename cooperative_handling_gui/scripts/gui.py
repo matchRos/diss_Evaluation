@@ -4,6 +4,7 @@ import time
 import yaml
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox, QLabel
 from PyQt5.QtCore import QTimer
+import threading
 
 class ROSGui(QWidget):
     def __init__(self):
@@ -20,7 +21,7 @@ class ROSGui(QWidget):
         
         # Timer for periodic status check
         self.status_timer = QTimer()
-        self.status_timer.timeout.connect(self.update_status)
+        self.status_timer.timeout.connect(self.start_status_update)
         self.status_timer.start(3000)  # Check status every 3 seconds
 
 
@@ -190,6 +191,10 @@ class ROSGui(QWidget):
         command = f"roslaunch handling zero_all_FT_sensors.launch robot_names:={robot_names_str} UR_prefixes:={ur_prefixes_str}"
         print(f"Executing: {command}")
         subprocess.Popen(command, shell=True)
+
+    def start_status_update(self):
+        """Starts the status update in a separate thread to prevent GUI freezing."""
+        threading.Thread(target=self.update_status, daemon=True).start()
 
     def update_status(self):
         """Checks the status of ROS controllers using the controller_manager service."""
