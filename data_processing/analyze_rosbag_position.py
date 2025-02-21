@@ -6,10 +6,7 @@ import argparse
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import interp1d
-import matplotlib
 import open3d as o3d
-
-
 
 # Transformation vom Messsystem ins Karten-Koordinatensystem
 translation_offset = np.array([39.2691-0.1710, 31.8942-0.0634, 0])
@@ -24,7 +21,7 @@ def rotate_z(points, angle):
     ])
     return points @ R.T
 
-def extract_tf_data(bag_file):
+def extract_tf_data_positions(bag_file):
     """ Extrahiert die Positionen von 'virtual_object/base_link' und 'leiter' aus einer ROS-Bag. """
     virtual_object_positions = []
     leiter_positions = []
@@ -55,31 +52,36 @@ def extract_tf_data(bag_file):
     
     return virtual_object_df, leiter_df
 
+def synchronize_positions(virtual_object_df, leiter_df):
+    """ Interpoliert BEIDE Trajektorien, sodass sie die gleiche Anzahl an Punkten haben. """
+    
+    # Gemeinsame Zeitbasis mit maximaler Auflösung
+    n_points = max(len(virtual_object_df), len(leiter_df))
+    time_common = np.linspace(0, 1, n_points)
 
-def synchronize_data(virtual_object_df, leiter_df):
-    """ Interpoliert die Daten von 'leiter', damit beide Datensätze die gleiche Anzahl an Zeitpunkten haben. """
-    n_points = min(len(virtual_object_df), len(leiter_df))
+    # Interpolation für Virtual Object (x, y, z)
+    interp_x_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["x"], kind="linear", fill_value="extrapolate")
+    interp_y_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["y"], kind="linear", fill_value="extrapolate")
+    interp_z_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["z"], kind="linear", fill_value="extrapolate")
 
-    # Interpolation für x, y, z in Leiter-Daten
-    interp_x = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["x"], kind="linear", fill_value="extrapolate")
-    interp_y = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["y"], kind="linear", fill_value="extrapolate")
-    interp_z = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["z"], kind="linear", fill_value="extrapolate")
-
-    leiter_df_interp = pd.DataFrame({
-        "x": interp_x(np.linspace(0, 1, n_points)),
-        "y": interp_y(np.linspace(0, 1, n_points)),
-        "z": interp_z(np.linspace(0, 1, n_points))
+    virtual_object_interpolated = pd.DataFrame({
+        "x": interp_x_virtual(time_common),
+        "y": interp_y_virtual(time_common),
+        "z": interp_z_virtual(time_common)
     })
 
-    # Gleiche Anzahl an Punkten sicherstellen
-    virtual_object_df = virtual_object_df.iloc[:n_points].reset_index(drop=True)
-    leiter_df_interp = leiter_df_interp.reset_index(drop=True)
+    # Interpolation für Leiter (x, y, z)
+    interp_x_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["x"], kind="linear", fill_value="extrapolate")
+    interp_y_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["y"], kind="linear", fill_value="extrapolate")
+    interp_z_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["z"], kind="linear", fill_value="extrapolate")
 
-    return virtual_object_df, leiter_df_interp
+    leiter_interpolated = pd.DataFrame({
+        "x": interp_x_leiter(time_common),
+        "y": interp_y_leiter(time_common),
+        "z": interp_z_leiter(time_common)
+    })
 
-
-
-
+    return virtual_object_interpolated, leiter_interpolated
 
 def compute_error(virtual_object_df, leiter_df):
     """ Berechnet den Fehler zwischen der transformierten Leiter-Trajektorie und dem virtuellen Objekt. """
@@ -112,28 +114,62 @@ def compute_error(virtual_object_df, leiter_df):
 
     return error_stats
 
-def plot_trajectories(virtual_object_df, leiter_df):
+def plot_trajectories_2d(virtual_object_df, leiter_df):
+    """ Erstellt eine 2D-Visualisierung der Positionsfehler über die Zeit. """
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+    time = np.arange(len(virtual_object_df))
+
+    # x-Fehler
+    axes[0].plot(time, virtual_object_df["x"], label="Virtual Object x", color="blue")
+    axes[0].plot(time, leiter_df["x"], label="Leiter x (transformed)", color="red", linestyle="dashed")
+    axes[0].set_ylabel("x (m)")
+    axes[0].legend()
+    axes[0].grid()
+
+    # y-Fehler
+    axes[1].plot(time, virtual_object_df["y"], label="Virtual Object y", color="blue")
+    axes[1].plot(time, leiter_df["y"], label="Leiter y (transformed)", color="red", linestyle="dashed")
+    axes[1].set_ylabel("y (m)")
+    axes[1].legend()
+    axes[1].grid()
+
+    # z-Fehler
+    axes[2].plot(time, virtual_object_df["z"], label="Virtual Object z", color="blue")
+    axes[2].plot(time, leiter_df["z"], label="Leiter z (transformed)", color="red", linestyle="dashed")
+    axes[2].set_ylabel("z (m)")
+    axes[2].set_xlabel("Zeitpunkt")
+    axes[2].legend()
+    axes[2].grid()
+
+    plt.suptitle("Vergleich der Positionen x, y, z")
+    plt.tight_layout()
+    plt.show()
+
+    # Save as PDF
+    fig.savefig("position_comparison_2d.pdf", bbox_inches='tight')
+
+def plot_trajectories_3d(virtual_object_df, leiter_df):
     """ Erstellt eine 3D-Visualisierung der Trajektorien. """
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111, projection='3d')
 
-    # Originale Soll-Daten (Virtual Object) plotten
-    ax.plot(virtual_object_df["x"], virtual_object_df["y"], virtual_object_df["z"], label="Virtual Object", color="blue", alpha=0.6)
+    # Originale Trajektorie (Virtual Object)
+    ax.plot(virtual_object_df["x"], virtual_object_df["y"], virtual_object_df["z"], 
+            label="Virtual Object", color="blue", alpha=0.6)
 
-    # Transformierte Ist-Daten (Leiter) plotten
-    ax.plot(leiter_df["x"], leiter_df["y"], leiter_df["z"], label="Leiter (transformed)", color="red", alpha=0.6)
+    # Transformierte Leiter-Trajektorie
+    ax.plot(leiter_df["x"], leiter_df["y"], leiter_df["z"], 
+            label="Leiter (transformed)", color="red", linestyle="dashed", alpha=0.6)
 
-    ax.set_xlabel("X-Koordinate")
-    ax.set_ylabel("Y-Koordinate")
-    ax.set_zlabel("Z-Koordinate")
-    ax.set_title("Vergleich der Trajektorien nach Transformation")
+    ax.set_xlabel("X (m)")
+    ax.set_ylabel("Y (m)")
+    ax.set_zlabel("Z (m)")
+    ax.set_title("Vergleich der Positions-Trajektorien (x, y, z)")
     ax.legend()
 
     plt.show()
-
-    # save as pdf
-    fig.savefig("trajectory_comparison.pdf", bbox_inches='tight')
-
+    fig.savefig("position_comparison_3d.pdf", bbox_inches='tight')
 
 def apply_icp(leiter_df, virtual_object_df):
     """ Führt die ICP-Registrierung durch, um die bestmögliche Transformation zu bestimmen. """
@@ -169,26 +205,21 @@ def apply_icp(leiter_df, virtual_object_df):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyse der Leiter- und Virtual Object-Trajektorien aus einer ROS-Bag.")
+    parser = argparse.ArgumentParser(description="Analyse der Positionsdaten aus einer ROS-Bag.")
     parser.add_argument("bag_file", type=str, help="Pfad zur ROS-Bag-Datei")
 
     args = parser.parse_args()
-    virtual_object_df, leiter_df = extract_tf_data(args.bag_file)
+    virtual_object_df, leiter_df = extract_tf_data_positions(args.bag_file)
 
-    # Rufe die Funktion nach der Extraktion auf:
-    virtual_object_df, leiter_df = synchronize_data(virtual_object_df, leiter_df)
-    
-    if virtual_object_df.empty or leiter_df.empty:
-        print("❌ Keine relevanten /tf-Daten gefunden.")
-        return
-    
+    # Synchronisierung der Daten
+    virtual_object_df, leiter_df = synchronize_positions(virtual_object_df, leiter_df)
+
     # ICP-Transformation anwenden
     leiter_df, transformation_matrix = apply_icp(leiter_df, virtual_object_df)
 
-    # Ausgabe der Transformationsmatrix
-    print("\n🔄 ICP-Transformation Matrix:")
-    print(transformation_matrix)
-
+    # Fehleranalyse
+    plot_trajectories_2d(virtual_object_df, leiter_df)
+    plot_trajectories_3d(virtual_object_df, leiter_df)
 
     errors = compute_error(virtual_object_df, leiter_df)
     
@@ -196,8 +227,6 @@ def main():
         print("\n🔍 Fehleranalyse:")
         for key, value in errors.items():
             print(f"{key}: {value:.4f} m")
-
-    plot_trajectories(virtual_object_df, leiter_df)
 
 if __name__ == "__main__":
     main()
