@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import interp1d
 import matplotlib
-import tf.transformations as tf_trans
 import open3d as o3d
 
 
@@ -25,16 +24,10 @@ def rotate_z(points, angle):
     ])
     return points @ R.T
 
-def quaternion_to_euler(quat):
-    """ Wandelt eine Quaternion (x, y, z, w) in Euler-Winkel (Rx, Ry, Rz) um. """
-    return tf_trans.euler_from_quaternion([quat[0], quat[1], quat[2], quat[3]])
-
-def extract_tf_data_with_orientation(bag_file):
-    """ Extrahiert Positionen und Orientierungen als Euler-Winkel aus einer ROS-Bag. """
+def extract_tf_data(bag_file):
+    """ Extrahiert die Positionen von 'virtual_object/base_link' und 'leiter' aus einer ROS-Bag. """
     virtual_object_positions = []
-    virtual_object_orientations = []
     leiter_positions = []
-    leiter_orientations = []
     
     with rosbag.Bag(bag_file, 'r') as bag:
         for topic, msg, t in bag.read_messages(topics=['/tf']):
@@ -48,35 +41,19 @@ def extract_tf_data_with_orientation(bag_file):
                     transform.transform.translation.z
                 ])
                 
-                # Quaternion -> Euler-Winkel
-                quaternion = np.array([
-                    transform.transform.rotation.x,
-                    transform.transform.rotation.y,
-                    transform.transform.rotation.z,
-                    transform.transform.rotation.w
-                ])
-                euler_angles = quaternion_to_euler(quaternion)
-
                 # Daten sammeln
                 if frame_id == "virtual_object/base_link":
                     virtual_object_positions.append(position)
-                    virtual_object_orientations.append(euler_angles)
                 elif frame_id == "leiter":
                     # Transformation ins Karten-Koordinatensystem
                     transformed_position = rotate_z(position - translation_offset, rotation_angle)
-                    transformed_orientation = np.array(euler_angles) + np.array([0, 0, rotation_angle])  # Nur Rz korrigieren
-                    
                     leiter_positions.append(transformed_position)
-                    leiter_orientations.append(transformed_orientation)
     
     # Umwandlung in DataFrames
     virtual_object_df = pd.DataFrame(virtual_object_positions, columns=["x", "y", "z"])
-    virtual_object_orientations_df = pd.DataFrame(virtual_object_orientations, columns=["Rx", "Ry", "Rz"])
-    
     leiter_df = pd.DataFrame(leiter_positions, columns=["x", "y", "z"])
-    leiter_orientations_df = pd.DataFrame(leiter_orientations, columns=["Rx", "Ry", "Rz"])
     
-    return virtual_object_df, virtual_object_orientations_df, leiter_df, leiter_orientations_df
+    return virtual_object_df, leiter_df
 
 
 def synchronize_data(virtual_object_df, leiter_df):
@@ -99,6 +76,10 @@ def synchronize_data(virtual_object_df, leiter_df):
     leiter_df_interp = leiter_df_interp.reset_index(drop=True)
 
     return virtual_object_df, leiter_df_interp
+
+
+
+
 
 def compute_error(virtual_object_df, leiter_df):
     """ Berechnet den Fehler zwischen der transformierten Leiter-Trajektorie und dem virtuellen Objekt. """
@@ -153,6 +134,7 @@ def plot_trajectories(virtual_object_df, leiter_df):
     # save as pdf
     fig.savefig("trajectory_comparison.pdf", bbox_inches='tight')
 
+
 def apply_icp(leiter_df, virtual_object_df):
     """ Führt die ICP-Registrierung durch, um die bestmögliche Transformation zu bestimmen. """
 
@@ -186,48 +168,15 @@ def apply_icp(leiter_df, virtual_object_df):
     return pd.DataFrame(leiter_transformed_corrected, columns=["x", "y", "z"]), transformation_icp
 
 
-def apply_icp_rotation(leiter_orientation_df, virtual_object_orientation_df):
-    """ Führt die ICP-Registrierung für die Euler-Winkel (Rx, Ry, Rz) durch. """
-    
-    # Punktwolken aus Euler-Winkeln erzeugen
-    def convert_to_point_cloud(df):
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(df.to_numpy())
-        return pcd
-
-    leiter_pcd = convert_to_point_cloud(leiter_orientation_df)
-    virtual_object_pcd = convert_to_point_cloud(virtual_object_orientation_df)
-
-    # ICP-Registrierung durchführen
-    threshold = 0.1  # Höherer Threshold für Winkel (Einheiten in Radiant)
-    reg_p2p = o3d.pipelines.registration.registration_icp(
-        leiter_pcd, virtual_object_pcd, threshold,
-        np.identity(4),
-        o3d.pipelines.registration.TransformationEstimationPointToPoint()
-    )
-
-    # Transformationsmatrix ausgeben
-    transformation_icp = reg_p2p.transformation
-    print("\n🔄 ICP-Transformation Matrix für Orientierung:")
-    print(transformation_icp)
-
-    # Transformation auf die Euler-Winkel anwenden
-    leiter_pcd.transform(transformation_icp)
-
-    # Rückgabe der transformierten Orientierungsdaten
-    leiter_transformed_corrected = np.asarray(leiter_pcd.points)
-    return pd.DataFrame(leiter_transformed_corrected, columns=["Rx", "Ry", "Rz"]), transformation_icp
-
 def main():
     parser = argparse.ArgumentParser(description="Analyse der Leiter- und Virtual Object-Trajektorien aus einer ROS-Bag.")
     parser.add_argument("bag_file", type=str, help="Pfad zur ROS-Bag-Datei")
 
     args = parser.parse_args()
-    virtual_object_df, virtual_object_orientations_df, leiter_df, leiter_orientations_df = extract_tf_data_with_orientation(args.bag_file)
+    virtual_object_df, leiter_df = extract_tf_data(args.bag_file)
 
     # Rufe die Funktion nach der Extraktion auf:
-    virtual_object_orientations_df, leiter_orientations_df = synchronize_data(virtual_object_orientations_df, leiter_orientations_df)
-
+    virtual_object_df, leiter_df = synchronize_data(virtual_object_df, leiter_df)
     
     if virtual_object_df.empty or leiter_df.empty:
         print("❌ Keine relevanten /tf-Daten gefunden.")
@@ -235,9 +184,6 @@ def main():
     
     # ICP-Transformation anwenden
     leiter_df, transformation_matrix = apply_icp(leiter_df, virtual_object_df)
-
-    # ICP für Orientierung anwenden
-    leiter_orientations_df, rotation_transformation_matrix = apply_icp_rotation(leiter_orientations_df, virtual_object_orientations_df)
 
     # Ausgabe der Transformationsmatrix
     print("\n🔄 ICP-Transformation Matrix:")
