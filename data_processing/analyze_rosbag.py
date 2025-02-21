@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import interp1d
 import matplotlib
-#matplotlib.use('Agg')  # Nutzt ein Backend ohne GUI (kein Qt)
+import open3d as o3d
 
 
 
 # Transformation vom Messsystem ins Karten-Koordinatensystem
-translation_offset = np.array([39.2691+0.1710, 31.8942, 0])
+translation_offset = np.array([39.2691-0.1710, 31.8942-0.0634, 0])
 rotation_angle = 3.1656  # Rotation um die Z-Achse
 
 def rotate_z(points, angle):
@@ -131,6 +131,39 @@ def plot_trajectories(virtual_object_df, leiter_df):
 
     plt.show()
 
+def apply_icp(leiter_df, virtual_object_df):
+    """ Führt die ICP-Registrierung durch, um die bestmögliche Transformation zu bestimmen. """
+
+    # Konvertiere die Daten in Punktwolken
+    def convert_to_point_cloud(df):
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(df.to_numpy())
+        return pcd
+
+    leiter_pcd = convert_to_point_cloud(leiter_df)
+    virtual_object_pcd = convert_to_point_cloud(virtual_object_df)
+
+    # ICP-Registrierung durchführen
+    threshold = 0.2  # Maximale Distanz für das Matching
+    reg_p2p = o3d.pipelines.registration.registration_icp(
+        leiter_pcd, virtual_object_pcd, threshold,
+        np.identity(4),
+        o3d.pipelines.registration.TransformationEstimationPointToPoint()
+    )
+
+    # Transformationsmatrix
+    transformation_icp = reg_p2p.transformation
+    print("\n🔄 ICP-Transformation Matrix:")
+    print(transformation_icp)
+
+    # Transformation auf die Leiter-Daten anwenden
+    leiter_pcd.transform(transformation_icp)
+
+    # Rückgabe der transformierten Daten
+    leiter_transformed_corrected = np.asarray(leiter_pcd.points)
+    return pd.DataFrame(leiter_transformed_corrected, columns=["x", "y", "z"]), transformation_icp
+
+
 def main():
     parser = argparse.ArgumentParser(description="Analyse der Leiter- und Virtual Object-Trajektorien aus einer ROS-Bag.")
     parser.add_argument("bag_file", type=str, help="Pfad zur ROS-Bag-Datei")
@@ -145,6 +178,14 @@ def main():
         print("❌ Keine relevanten /tf-Daten gefunden.")
         return
     
+    # ICP-Transformation anwenden
+    leiter_df, transformation_matrix = apply_icp(leiter_df, virtual_object_df)
+
+    # Ausgabe der Transformationsmatrix
+    print("\n🔄 ICP-Transformation Matrix:")
+    print(transformation_matrix)
+
+
     errors = compute_error(virtual_object_df, leiter_df)
     
     if errors:
