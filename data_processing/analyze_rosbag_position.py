@@ -121,22 +121,22 @@ def plot_trajectories_2d(virtual_object_df, leiter_df):
     time = np.arange(len(virtual_object_df))
 
     # x-Fehler
-    axes[0].plot(time, virtual_object_df["x"], label="Virtual Object x", color="blue")
-    axes[0].plot(time, leiter_df["x"], label="Leiter x (transformed)", color="red", linestyle="dashed")
+    axes[0].plot(time, virtual_object_df["x"].to_numpy(), label="Virtual Object x", color="blue")
+    axes[0].plot(time, leiter_df["x"].to_numpy(), label="Leiter x (transformed)", color="red", linestyle="dashed")
     axes[0].set_ylabel("x (m)")
     axes[0].legend()
     axes[0].grid()
 
     # y-Fehler
-    axes[1].plot(time, virtual_object_df["y"], label="Virtual Object y", color="blue")
-    axes[1].plot(time, leiter_df["y"], label="Leiter y (transformed)", color="red", linestyle="dashed")
+    axes[1].plot(time, virtual_object_df["y"].to_numpy(), label="Virtual Object y", color="blue")
+    axes[1].plot(time, leiter_df["y"].to_numpy(), label="Leiter y (transformed)", color="red", linestyle="dashed")
     axes[1].set_ylabel("y (m)")
     axes[1].legend()
     axes[1].grid()
 
     # z-Fehler
-    axes[2].plot(time, virtual_object_df["z"], label="Virtual Object z", color="blue")
-    axes[2].plot(time, leiter_df["z"], label="Leiter z (transformed)", color="red", linestyle="dashed")
+    axes[2].plot(time, virtual_object_df["z"].to_numpy(), label="Virtual Object z", color="blue")
+    axes[2].plot(time, leiter_df["z"].to_numpy(), label="Leiter z (transformed)", color="red", linestyle="dashed")
     axes[2].set_ylabel("z (m)")
     axes[2].set_xlabel("Zeitpunkt")
     axes[2].legend()
