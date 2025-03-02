@@ -21,11 +21,13 @@ def rotate_z(points, angle):
     ])
     return points @ R.T
 
-def extract_tf_data_positions(bag_file):
-    """ Extrahiert die Positionen von 'virtual_object/base_link' und 'leiter' aus einer ROS-Bag. """
+def extract_tf_data_with_timestamps(bag_file):
+    """ Extrahiert die Positionen von 'virtual_object/base_link' und 'leiter' aus einer ROS-Bag, inkl. Zeitstempel. """
     virtual_object_positions = []
+    virtual_object_timestamps = []
     leiter_positions = []
-    
+    leiter_timestamps = []
+
     with rosbag.Bag(bag_file, 'r') as bag:
         for topic, msg, t in bag.read_messages(topics=['/tf']):
             for transform in msg.transforms:
@@ -41,15 +43,19 @@ def extract_tf_data_positions(bag_file):
                 # Daten sammeln
                 if frame_id == "virtual_object/base_link":
                     virtual_object_positions.append(position)
+                    virtual_object_timestamps.append(t.to_sec())  # Zeitstempel in Sekunden
                 elif frame_id == "leiter":
-                    # Transformation ins Karten-Koordinatensystem
                     transformed_position = rotate_z(position - translation_offset, rotation_angle)
                     leiter_positions.append(transformed_position)
-    
+                    leiter_timestamps.append(t.to_sec())
+
     # Umwandlung in DataFrames
     virtual_object_df = pd.DataFrame(virtual_object_positions, columns=["x", "y", "z"])
+    virtual_object_df["timestamp"] = virtual_object_timestamps  # Zeitstempel hinzufügen
+
     leiter_df = pd.DataFrame(leiter_positions, columns=["x", "y", "z"])
-    
+    leiter_df["timestamp"] = leiter_timestamps  # Zeitstempel hinzufügen
+
     return virtual_object_df, leiter_df
 
 def synchronize_positions(virtual_object_df, leiter_df):
@@ -209,7 +215,7 @@ def main():
     parser.add_argument("bag_file", type=str, help="Pfad zur ROS-Bag-Datei")
 
     args = parser.parse_args()
-    virtual_object_df, leiter_df = extract_tf_data_positions(args.bag_file)
+    virtual_object_df, leiter_df = extract_tf_data_with_timestamps(args.bag_file)
 
     # Synchronisierung der Daten
     virtual_object_df, leiter_df = synchronize_positions(virtual_object_df, leiter_df)
