@@ -78,19 +78,6 @@ def synchronize_positions_time_based(virtual_object_df, leiter_df):
         "timestamp": time_virtual  # Zeit bleibt jetzt synchron
     })
 
-    plt.figure(figsize=(10, 5))
-
-    plt.plot(virtual_object_df["timestamp"].to_numpy(), virtual_object_df["x"].to_numpy(), label="Virtual Object x", color="blue")
-    plt.plot(leiter_df["timestamp"].to_numpy(), leiter_df["x"].to_numpy(), label="Leiter x (interpoliert)", color="red", linestyle="dashed")
-
-    plt.xlabel("Zeitstempel (s)")
-    plt.ylabel("x-Position (m)")
-    plt.title("Vergleich der Zeitbasierten Synchronisation")
-    plt.legend()
-    plt.grid()
-    plt.show()
-
-
     return virtual_object_df, leiter_interpolated
 
 
@@ -187,6 +174,51 @@ def plot_trajectories_3d(virtual_object_df, leiter_df):
     plt.show()
     fig.savefig("position_comparison_3d.pdf", bbox_inches='tight')
 
+def plot_rmse_over_time(virtual_object_df, leiter_df):
+    """ Plottet den RMSE-Fehler über die Zeit für x, y und z. """
+
+    # Sicherstellen, dass nur die relevanten Spalten verwendet werden
+    if "timestamp" in virtual_object_df.columns:
+        timestamps = virtual_object_df["timestamp"].to_numpy()  # Sicherstellen, dass es ein NumPy-Array ist
+        virtual_object_df = virtual_object_df[["x", "y", "z"]]
+        leiter_df = leiter_df[["x", "y", "z"]]
+    else:
+        timestamps = np.arange(len(virtual_object_df))  # Falls kein Timestamp vorhanden ist
+
+    # Fehler pro Achse berechnen
+    error_x = virtual_object_df["x"].to_numpy() - leiter_df["x"].to_numpy()
+    error_y = virtual_object_df["y"].to_numpy() - leiter_df["y"].to_numpy()
+    error_z = virtual_object_df["z"].to_numpy() - leiter_df["z"].to_numpy()
+
+    # RMSE über die Zeit berechnen
+    rmse_x = np.sqrt(np.cumsum(error_x**2) / np.arange(1, len(error_x) + 1))
+    rmse_y = np.sqrt(np.cumsum(error_y**2) / np.arange(1, len(error_y) + 1))
+    rmse_z = np.sqrt(np.cumsum(error_z**2) / np.arange(1, len(error_z) + 1))
+
+    # combine RMSE
+    rmse = np.vstack([rmse_x, rmse_y, rmse_z]).T
+    
+    
+
+    # Plot erstellen
+    plt.figure(figsize=(10, 5))
+    # plt.plot(timestamps, rmse_x, label="RMSE x", color="blue")
+    # plt.plot(timestamps, rmse_y, label="RMSE y", color="green")
+    # plt.plot(timestamps, rmse_z, label="RMSE z", color="red")
+    plt.plot(timestamps, np.mean(rmse, axis=1), label="RMSE (mean)", color="blue")
+    
+    
+    plt.xlabel("Zeit (s)")
+    plt.ylabel("RMSE (m)")
+    plt.title("RMSE Fehler über die Zeit")
+    plt.legend()
+    plt.grid()
+    #plt.show()
+
+    # Speichern als PDF
+    plt.savefig("rmse_over_time.pdf", bbox_inches='tight')
+
+
 def apply_icp(leiter_df, virtual_object_df):
     """ Führt die ICP-Registrierung durch, um die bestmögliche Transformation zu bestimmen. """
 
@@ -256,6 +288,8 @@ def main():
     # Fehleranalyse
     plot_trajectories_2d(virtual_object_df, leiter_df)
     plot_trajectories_3d(virtual_object_df, leiter_df)
+    plot_rmse_over_time(virtual_object_df, leiter_df)
+
 
     errors = compute_error(virtual_object_df, leiter_df)
     
