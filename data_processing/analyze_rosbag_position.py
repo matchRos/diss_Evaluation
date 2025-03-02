@@ -58,38 +58,6 @@ def extract_tf_data_with_timestamps(bag_file):
 
     return virtual_object_df, leiter_df
 
-def synchronize_positions(virtual_object_df, leiter_df):
-    """ Interpoliert BEIDE Trajektorien, sodass sie die gleiche Anzahl an Punkten haben. """
-    
-    # Gemeinsame Zeitbasis mit maximaler Auflösung
-    n_points = max(len(virtual_object_df), len(leiter_df))
-    time_common = np.linspace(0, 1, n_points)
-
-    # Interpolation für Virtual Object (x, y, z)
-    interp_x_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["x"], kind="linear", fill_value="extrapolate")
-    interp_y_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["y"], kind="linear", fill_value="extrapolate")
-    interp_z_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["z"], kind="linear", fill_value="extrapolate")
-
-    virtual_object_interpolated = pd.DataFrame({
-        "x": interp_x_virtual(time_common),
-        "y": interp_y_virtual(time_common),
-        "z": interp_z_virtual(time_common)
-    })
-
-    # Interpolation für Leiter (x, y, z)
-    interp_x_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["x"], kind="linear", fill_value="extrapolate")
-    interp_y_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["y"], kind="linear", fill_value="extrapolate")
-    interp_z_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["z"], kind="linear", fill_value="extrapolate")
-
-    leiter_interpolated = pd.DataFrame({
-        "x": interp_x_leiter(time_common),
-        "y": interp_y_leiter(time_common),
-        "z": interp_z_leiter(time_common)
-    })
-
-    return virtual_object_interpolated, leiter_interpolated
-
-
 def synchronize_positions_time_based(virtual_object_df, leiter_df):
     """ Interpoliert 'leiter' auf die Zeitbasis von 'virtual_object' mittels linearer Interpolation. """
 
@@ -131,6 +99,11 @@ def compute_error(virtual_object_df, leiter_df):
     if len(virtual_object_df) != len(leiter_df):
         print("⚠️ Achtung: Unterschiedliche Anzahl an Zeitpunkten! Die Daten sollten synchronisiert werden.")
         return None
+
+    # Sicherstellen, dass nur x, y, z enthalten sind
+    virtual_object_df = virtual_object_df[["x", "y", "z"]]
+    leiter_df = leiter_df[["x", "y", "z"]]
+
 
     errors = np.linalg.norm(virtual_object_df.to_numpy() - leiter_df.to_numpy(), axis=1)
     
@@ -198,11 +171,11 @@ def plot_trajectories_3d(virtual_object_df, leiter_df):
     ax = fig.add_subplot(111, projection='3d')
 
     # Originale Trajektorie (Virtual Object)
-    ax.plot(virtual_object_df["x"], virtual_object_df["y"], virtual_object_df["z"], 
+    ax.plot(virtual_object_df["x"].to_numpy(), virtual_object_df["y"].to_numpy(), virtual_object_df["z"], 
             label="Virtual Object", color="blue", alpha=0.6)
 
     # Transformierte Leiter-Trajektorie
-    ax.plot(leiter_df["x"], leiter_df["y"], leiter_df["z"], 
+    ax.plot(leiter_df["x"].to_numpy(), leiter_df["y"].to_numpy(), leiter_df["z"], 
             label="Leiter (transformed)", color="red", linestyle="dashed", alpha=0.6)
 
     ax.set_xlabel("X (m)")
