@@ -89,6 +89,43 @@ def synchronize_positions(virtual_object_df, leiter_df):
 
     return virtual_object_interpolated, leiter_interpolated
 
+
+def synchronize_positions_time_based(virtual_object_df, leiter_df):
+    """ Interpoliert 'leiter' auf die Zeitbasis von 'virtual_object' mittels linearer Interpolation. """
+
+    # Extrahiere die Zeitstempel
+    time_virtual = virtual_object_df["timestamp"].to_numpy()
+    time_leiter = leiter_df["timestamp"].to_numpy()
+
+    # Interpolation für x, y, z
+    interp_x = interp1d(time_leiter, leiter_df["x"], kind="linear", fill_value="extrapolate")
+    interp_y = interp1d(time_leiter, leiter_df["y"], kind="linear", fill_value="extrapolate")
+    interp_z = interp1d(time_leiter, leiter_df["z"], kind="linear", fill_value="extrapolate")
+
+    # Interpolierte Werte für die Zeitpunkte des Virtual Objects berechnen
+    leiter_interpolated = pd.DataFrame({
+        "x": interp_x(time_virtual),
+        "y": interp_y(time_virtual),
+        "z": interp_z(time_virtual),
+        "timestamp": time_virtual  # Zeit bleibt jetzt synchron
+    })
+
+    plt.figure(figsize=(10, 5))
+
+    plt.plot(virtual_object_df["timestamp"].to_numpy(), virtual_object_df["x"].to_numpy(), label="Virtual Object x", color="blue")
+    plt.plot(leiter_df["timestamp"].to_numpy(), leiter_df["x"].to_numpy(), label="Leiter x (interpoliert)", color="red", linestyle="dashed")
+
+    plt.xlabel("Zeitstempel (s)")
+    plt.ylabel("x-Position (m)")
+    plt.title("Vergleich der Zeitbasierten Synchronisation")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
+    return virtual_object_df, leiter_interpolated
+
+
 def compute_error(virtual_object_df, leiter_df):
     """ Berechnet den Fehler zwischen der transformierten Leiter-Trajektorie und dem virtuellen Objekt. """
     if len(virtual_object_df) != len(leiter_df):
@@ -182,9 +219,29 @@ def apply_icp(leiter_df, virtual_object_df):
 
     # Konvertiere die Daten in Punktwolken
     def convert_to_point_cloud(df):
+        """ Konvertiert einen DataFrame mit x, y, z in eine Open3D Point Cloud. """
+        
+        # Sicherstellen, dass nur x, y, z als Spalten vorhanden sind
+        if "timestamp" in df.columns:
+            df = df.drop(columns=["timestamp"])  # Zeitstempel entfernen
+
+        # Sicherstellen, dass die Daten float64 sind
+        df = df.astype(np.float64)
+
+        # Prüfen, ob NaN-Werte existieren
+        if df.isnull().values.any():
+            raise ValueError("❌ Fehler: DataFrame enthält NaN-Werte! Bitte überprüfen.")
+
+        # Prüfen, ob die Dimensionen korrekt sind
+        if df.shape[1] != 3:
+            raise ValueError(f"❌ Fehler: Erwartete 3 Spalten (x, y, z), aber erhalten: {df.shape[1]} Spalten.")
+
+        # Open3D Punktwolke erzeugen
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(df.to_numpy())
+
         return pcd
+
 
     leiter_pcd = convert_to_point_cloud(leiter_df)
     virtual_object_pcd = convert_to_point_cloud(virtual_object_df)
@@ -218,7 +275,7 @@ def main():
     virtual_object_df, leiter_df = extract_tf_data_with_timestamps(args.bag_file)
 
     # Synchronisierung der Daten
-    virtual_object_df, leiter_df = synchronize_positions(virtual_object_df, leiter_df)
+    virtual_object_df, leiter_df = synchronize_positions_time_based(virtual_object_df, leiter_df)
 
     # ICP-Transformation anwenden
     leiter_df, transformation_matrix = apply_icp(leiter_df, virtual_object_df)
