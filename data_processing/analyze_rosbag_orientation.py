@@ -111,15 +111,35 @@ def apply_icp_orientations(leiter_df, virtual_object_df):
 
     # Konvertiere die Daten in Punktwolken
     def convert_to_point_cloud(df):
+        """ Konvertiert einen DataFrame mit Rx, Ry, Rz in eine Open3D Point Cloud. """
+        
+        # Sicherstellen, dass nur Rx, Ry, Rz als Spalten enthalten sind
+        if "timestamp" in df.columns:
+            df = df.drop(columns=["timestamp"])
+
+        # Sicherstellen, dass die Daten float64 sind
+        df = df.astype(np.float64)
+
+        # Prüfen, ob NaN-Werte existieren
+        if df.isnull().values.any():
+            raise ValueError("❌ Fehler: DataFrame enthält NaN-Werte! Bitte überprüfen.")
+
+        # Prüfen, ob die Dimensionen korrekt sind
+        if df.shape[1] != 3:
+            raise ValueError(f"❌ Fehler: Erwartete 3 Spalten (Rx, Ry, Rz), aber erhalten: {df.shape[1]} Spalten.")
+
+        # Open3D Punktwolke erzeugen
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(df.to_numpy())
+
         return pcd
+
 
     leiter_pcd = convert_to_point_cloud(leiter_df)
     virtual_object_pcd = convert_to_point_cloud(virtual_object_df)
 
     # ICP-Registrierung durchführen
-    threshold = 0.1  # Höherer Threshold für Winkel (Radiant)
+    threshold = 1.5  # Höherer Threshold für Winkel (Radiant)
     reg_p2p = o3d.pipelines.registration.registration_icp(
         leiter_pcd, virtual_object_pcd, threshold,
         np.identity(4),
