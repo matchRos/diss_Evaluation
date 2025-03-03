@@ -6,20 +6,20 @@ import argparse
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 import open3d as o3d
-import math
 
 # Transformation vom Messsystem ins Karten-Koordinatensystem
-translation_offset = np.array([38.2691, 32.8942, 0])
-rotation_angle = 0 # 3.1656  # Rotation um die Z-Achse
+rotation_angle = 0  # Falls Rotation nötig ist, hier setzen
 
 def quaternion_to_euler(quat):
     """ Wandelt eine Quaternion (x, y, z, w) in Euler-Winkel (Rx, Ry, Rz) um. """
     return tf.transformations.euler_from_quaternion([quat[0], quat[1], quat[2], quat[3]])
 
 def extract_tf_data_orientations(bag_file):
-    """ Extrahiert die Orientierung (Rx, Ry, Rz) aus einer ROS-Bag für virtual_object/base_link und leiter. """
+    """ Extrahiert die Orientierung (Rx, Ry, Rz) und Zeitstempel aus einer ROS-Bag. """
     virtual_object_orientations = []
+    virtual_object_timestamps = []
     leiter_orientations = []
+    leiter_timestamps = []
     
     with rosbag.Bag(bag_file, 'r') as bag:
         for topic, msg, t in bag.read_messages(topics=['/tf']):
@@ -40,50 +40,71 @@ def extract_tf_data_orientations(bag_file):
                 # Daten sammeln
                 if frame_id == "virtual_object/base_link":
                     virtual_object_orientations.append(euler_angles)
+                    virtual_object_timestamps.append(t.to_sec())
                 elif frame_id == "leiter":
-                    # Korrektur der Rz-Drehung ins Karten-Koordinatensystem
-                    euler_angles[0] = -euler_angles[0] 
-                    euler_angles[1] = -euler_angles[1] # Invertierung der Y-Rotation
+                    euler_angles[0] = -euler_angles[0]
+                    euler_angles[1] = -euler_angles[1]
                     corrected_orientation = euler_angles + np.array([0, 0, rotation_angle])
                     leiter_orientations.append(corrected_orientation)
-    
+                    leiter_timestamps.append(t.to_sec())
+
     # Umwandlung in DataFrames
     virtual_object_df = pd.DataFrame(virtual_object_orientations, columns=["Rx", "Ry", "Rz"])
+    virtual_object_df["timestamp"] = virtual_object_timestamps
+
     leiter_df = pd.DataFrame(leiter_orientations, columns=["Rx", "Ry", "Rz"])
+    leiter_df["timestamp"] = leiter_timestamps
     
     return virtual_object_df, leiter_df
 
-def synchronize_orientations(virtual_object_df, leiter_df):
-    """ Interpoliert BEIDE Datensätze, sodass sie auf einer gemeinsamen Zeitachse liegen. """
+def synchronize_orientations_time_based(virtual_object_df, leiter_df):
+    """ Interpoliert die Euler-Winkel von 'leiter' auf die Zeitbasis von 'virtual_object'. """
 
-    # Schritt 1: Erzeuge eine gemeinsame Zeitbasis mit der höchsten Auflösung
-    n_points = max(len(virtual_object_df), len(leiter_df))  # Nimmt das Maximum, nicht Minimum!
-    time_common = np.linspace(0, 1, n_points)
+    # Zeitstempel extrahieren
+    time_virtual = virtual_object_df["timestamp"].to_numpy()
+    time_leiter = leiter_df["timestamp"].to_numpy()
 
-    # Interpolation für Virtual Object (Rx, Ry, Rz)
-    interp_rx_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["Rx"], kind="linear", fill_value="extrapolate")
-    interp_ry_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["Ry"], kind="linear", fill_value="extrapolate")
-    interp_rz_virtual = interp1d(np.linspace(0, 1, len(virtual_object_df)), virtual_object_df["Rz"], kind="linear", fill_value="extrapolate")
+    # Interpolation für Rx, Ry, Rz
+    interp_rx = interp1d(time_leiter, leiter_df["Rx"], kind="linear", fill_value="extrapolate")
+    interp_ry = interp1d(time_leiter, leiter_df["Ry"], kind="linear", fill_value="extrapolate")
+    interp_rz = interp1d(time_leiter, leiter_df["Rz"], kind="linear", fill_value="extrapolate")
 
-    virtual_object_interpolated = pd.DataFrame({
-        "Rx": interp_rx_virtual(time_common),
-        "Ry": interp_ry_virtual(time_common),
-        "Rz": interp_rz_virtual(time_common)
-    })
-
-    # Interpolation für Leiter (Rx, Ry, Rz)
-    interp_rx_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["Rx"], kind="linear", fill_value="extrapolate")
-    interp_ry_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["Ry"], kind="linear", fill_value="extrapolate")
-    interp_rz_leiter = interp1d(np.linspace(0, 1, len(leiter_df)), leiter_df["Rz"], kind="linear", fill_value="extrapolate")
-
+    # Interpolierte Werte für die Zeitpunkte des Virtual Objects berechnen
     leiter_interpolated = pd.DataFrame({
-        "Rx": interp_rx_leiter(time_common),
-        "Ry": interp_ry_leiter(time_common),
-        "Rz": interp_rz_leiter(time_common)
+        "Rx": interp_rx(time_virtual),
+        "Ry": interp_ry(time_virtual),
+        "Rz": interp_rz(time_virtual),
+        "timestamp": time_virtual
     })
 
-    return virtual_object_interpolated, leiter_interpolated
+    return virtual_object_df, leiter_interpolated
 
+def plot_rmse_over_time(virtual_object_df, leiter_df):
+    """ Plottet den RMSE-Fehler über die Zeit für Rx, Ry und Rz. """
+
+    timestamps = virtual_object_df["timestamp"].to_numpy()
+
+    error_rx = virtual_object_df["Rx"].to_numpy() - leiter_df["Rx"].to_numpy()
+    error_ry = virtual_object_df["Ry"].to_numpy() - leiter_df["Ry"].to_numpy()
+    error_rz = virtual_object_df["Rz"].to_numpy() - leiter_df["Rz"].to_numpy()
+
+    rmse_rx = np.sqrt(np.cumsum(error_rx**2) / np.arange(1, len(error_rx) + 1))
+    rmse_ry = np.sqrt(np.cumsum(error_ry**2) / np.arange(1, len(error_ry) + 1))
+    rmse_rz = np.sqrt(np.cumsum(error_rz**2) / np.arange(1, len(error_rz) + 1))
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(timestamps, rmse_rx, label="RMSE Rx", color="blue")
+    plt.plot(timestamps, rmse_ry, label="RMSE Ry", color="green")
+    plt.plot(timestamps, rmse_rz, label="RMSE Rz", color="red")
+    
+    plt.xlabel("Zeit (s)")
+    plt.ylabel("RMSE (rad)")
+    plt.title("RMSE Fehler über die Zeit")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    plt.savefig("rmse_orientation_over_time.pdf", bbox_inches='tight')
 
 def apply_icp_orientations(leiter_df, virtual_object_df):
     """ Führt die ICP-Registrierung für die Euler-Winkel (Rx, Ry, Rz) durch. """
@@ -200,19 +221,19 @@ def plot_trajectories_3d(virtual_object_df, leiter_df):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyse der Euler-Winkel von Leiter und Virtual Object aus einer ROS-Bag.")
+    parser = argparse.ArgumentParser(description="Analyse der Euler-Winkel aus einer ROS-Bag.")
     parser.add_argument("bag_file", type=str, help="Pfad zur ROS-Bag-Datei")
 
     args = parser.parse_args()
     virtual_object_df, leiter_df = extract_tf_data_orientations(args.bag_file)
 
-    # Synchronisierung der Euler-Winkel
-    virtual_object_df, leiter_df = synchronize_orientations(virtual_object_df, leiter_df)
+    # Synchronisierung der Euler-Winkel basierend auf Zeit
+    virtual_object_df, leiter_df = synchronize_orientations_time_based(virtual_object_df, leiter_df)
 
     if virtual_object_df.empty or leiter_df.empty:
         print("❌ Keine relevanten /tf-Daten gefunden.")
         return
-    
+
     # ICP-Transformation für Orientierungen anwenden
     leiter_df, transformation_matrix = apply_icp_orientations(leiter_df, virtual_object_df)
 
