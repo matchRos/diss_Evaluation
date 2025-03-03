@@ -8,7 +8,7 @@ from scipy.interpolate import interp1d
 import open3d as o3d
 
 # Transformation vom Messsystem ins Karten-Koordinatensystem
-rotation_angle = 0  # Falls Rotation nötig ist, hier setzen
+rotation_angle = 0 # -np.pi  # Falls Rotation nötig ist, hier setzen
 
 def quaternion_to_euler(quat):
     """ Wandelt eine Quaternion (x, y, z, w) in Euler-Winkel (Rx, Ry, Rz) um. """
@@ -39,12 +39,19 @@ def extract_tf_data_orientations(bag_file):
 
                 # Daten sammeln
                 if frame_id == "virtual_object/base_link":
-                    virtual_object_orientations.append(euler_angles)
+                    corrected_orientation = euler_angles - np.array([0, 0, rotation_angle])
+                    if corrected_orientation[2] < -np.pi:
+                        corrected_orientation[2] += 2 * np.pi
+                    elif corrected_orientation[2] > np.pi:
+                        corrected_orientation[2] -= 2 * np.pi
+                    virtual_object_orientations.append(corrected_orientation)
                     virtual_object_timestamps.append(t.to_sec())
                 elif frame_id == "leiter":
-                    euler_angles[0] = -euler_angles[0]
-                    euler_angles[1] = -euler_angles[1]
-                    corrected_orientation = euler_angles + np.array([0, 0, rotation_angle])
+                    euler_angles[0] = euler_angles[0]
+                    euler_angles[1] = euler_angles[1]
+                    euler_angles[2] = euler_angles[2] 
+
+                    corrected_orientation = euler_angles 
                     leiter_orientations.append(corrected_orientation)
                     leiter_timestamps.append(t.to_sec())
 
